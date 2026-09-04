@@ -1,0 +1,247 @@
+/* styles/dashboard.css
+   Panel de administración de "¿Cuánto Compro?".
+   Reutiliza las variables de marca definidas en :root dentro de
+   styles/homepage.css (--cc-green, --cc-radius, --cc-shadow, etc.).
+   Importar DESPUÉS de homepage.css en app/layout.tsx, o en el layout
+   propio de /admin, para heredar esas variables. */
+
+.cc-dashboard {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ---------- Header ---------- */
+.cc-dashboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cc-dashboard__header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cc-text);
+}
+
+/* ---------- Tabs ---------- */
+.cc-dashboard__tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--cc-border);
+  margin-bottom: 24px;
+}
+
+.cc-tab {
+  border: none;
+  background: transparent;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cc-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transform: translateY(1px);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cc-tab:hover {
+  color: var(--cc-text);
+}
+
+.cc-tab--activa,
+.cc-tab--activo {
+  color: var(--cc-green-dark);
+  border-bottom-color: var(--cc-green);
+}
+
+/* ---------- Alertas ---------- */
+.cc-error {
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #f5c6c0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* ---------- Listado de negocios ---------- */
+.cc-dashboard__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cc-dashboard__fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--cc-white);
+  border-radius: var(--cc-radius);
+  box-shadow: var(--cc-shadow);
+  padding: 16px 18px;
+}
+
+.cc-dashboard__nombre {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cc-text);
+}
+
+.cc-dashboard__meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cc-text-muted);
+}
+
+.cc-dashboard__meta strong {
+  color: var(--cc-green-dark);
+}
+
+.cc-dashboard__acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ---------- Botones ---------- */
+.cc-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+
+.cc-btn:hover {
+  opacity: 0.9;
+}
+
+.cc-btn:active {
+  transform: scale(0.98);
+}
+
+.cc-btn:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.cc-btn--aprobar {
+  background: var(--cc-green);
+  color: var(--cc-white);
+}
+
+.cc-btn--eliminar {
+  background: var(--cc-white);
+  color: #c0392b;
+  border: 1px solid #f0c4bf;
+}
+
+/* Botón "Cerrar sesión" del header: estilo ghost por defecto */
+.cc-dashboard__header .cc-btn {
+  background: transparent;
+  color: var(--cc-text-muted);
+  border: 1px solid var(--cc-border);
+}
+
+/* ---------- Formulario "Nuevo negocio" ---------- */
+.cc-dashboard__form {
+  background: var(--cc-white);
+  border-radius: var(--cc-radius);
+  box-shadow: var(--cc-shadow);
+  padding: 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.cc-dashboard__form h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  grid-column: 1 / -1;
+}
+
+.cc-dashboard__form input {
+  padding: 10px 12px;
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--cc-bg);
+}
+
+.cc-dashboard__form input:focus {
+  outline: none;
+  border-color: var(--cc-green);
+  background: var(--cc-white);
+}
+
+.cc-dashboard__form button[type="submit"] {
+  grid-column: 1 / -1;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--cc-green);
+  color: var(--cc-white);
+  cursor: pointer;
+}
+
+.cc-dashboard__form button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width: 640px) {
+  .cc-dashboard__form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .cc-dashboard__form {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: end;
+  }
+
+  .cc-dashboard__form h2 {
+    grid-column: 1 / -1;
+  }
+
+  .cc-dashboard__form button[type="submit"] {
+    grid-column: auto;
+  }
+}
+
+/* ---------- Bloque de ubicación (lat/lng) en el alta de negocio ---------- */
+.cc-dashboard__ubicacion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cc-dashboard__ubicacion-ok {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cc-green-dark);
+}
+
+/* Aviso cuando un negocio no tiene lat/lng: no puede salir en "cercanos" */
+.cc-dashboard__aviso {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #b45309;
+}

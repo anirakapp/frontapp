@@ -1,0 +1,120 @@
+/* styles/header.css */
+
+.cc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  background: var(--cc-white);
+  border-bottom: 1px solid var(--cc-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cc-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-size: 15px;
+}
+
+.cc-header__logo {
+  font-size: 22px;
+}
+
+.cc-header__logo-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+/* ---------- Nav ---------- */
+.cc-header__nav {
+  display: none;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.cc-header__nav a {
+  color: var(--cc-text);
+  text-decoration: none;
+}
+
+.cc-header__nav-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--cc-border);
+  display: inline-block;
+}
+
+.cc-header__nav-link {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.cc-header__nav-link--cta {
+  background: var(--cc-green);
+  color: var(--cc-white);
+}
+
+.cc-header__nav-link--cta:hover {
+  background: var(--cc-green-dark);
+}
+
+.cc-header__nav-link--login {
+  border: 1px solid var(--cc-green);
+  color: var(--cc-green-dark);
+  background: transparent;
+}
+
+.cc-header__nav-link--login:hover {
+  background: var(--cc-green-light);
+}
+
+/* ---------- Selector de ciudad ---------- */
+.cc-header__ciudad {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  white-space: nowrap;
+  border: 1px solid var(--cc-border);
+  background: var(--cc-white);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cc-header__ciudad span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.cc-header__ubicacion {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width: 768px) {
+  .cc-header__nav {
+    display: flex;
+  }
+}

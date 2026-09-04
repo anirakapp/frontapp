@@ -1,0 +1,349 @@
+/* ==========================================================
+   styles/login.css
+   ========================================================== */
+
+.cc-login {
+  position: relative;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px 16px;
+
+  background: #0f0f10;
+  background: radial-gradient(
+    circle at top,
+    #1a1a1c 0%,
+    #0f0f10 60%
+  );
+}
+
+/* ---------- Botón volver al inicio ---------- */
+
+.cc-login__home {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+
+  background: #18181b;
+  color: #ffffff;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cc-login__home:hover {
+  background: #202023;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.cc-login__home:active {
+  transform: scale(0.95);
+}
+
+.cc-login__home svg {
+  width: 21px;
+  height: 21px;
+
+  color: #ffffff;
+  stroke: currentColor;
+}
+
+/* ---------- Card ---------- */
+
+.cc-login__card {
+  width: 100%;
+  max-width: 380px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 32px 28px;
+
+  border-radius: 16px;
+
+  background: #18181b;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Título ---------- */
+
+.cc-login__title {
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #ffffff;
+
+  margin: 0;
+
+  text-align: center;
+}
+
+/* ---------- Descripción ---------- */
+
+.cc-login__hint {
+  font-size: 13.5px;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  text-align: center;
+
+  margin: 0 0 8px;
+}
+
+/* ---------- Inputs ---------- */
+
+.cc-login__input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  font-size: 15px;
+
+  color: #ffffff;
+
+  background: #202023;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.cc-login__input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cc-login__input:focus {
+  border-color: #f97316;
+  background: #232326;
+}
+
+/* ---------- Wrapper contraseña ---------- */
+
+.cc-login__password-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+}
+
+/* Dejamos espacio para el ojo */
+
+.cc-login__input--password {
+  padding-right: 50px;
+}
+
+/* ---------- Botón ojo ---------- */
+
+.cc-login__toggle-eye {
+  position: absolute;
+
+  right: 8px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #000000;
+
+  cursor: pointer;
+
+  border-radius: 6px;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+/* El ojo siempre negro */
+
+.cc-login__toggle-eye svg {
+  width: 19px;
+  height: 19px;
+
+  color: #000000;
+  stroke: #000000;
+
+  stroke-width: 2;
+}
+
+/* Hover */
+
+.cc-login__toggle-eye:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #000000;
+}
+
+.cc-login__toggle-eye:hover svg {
+  color: #000000;
+  stroke: #000000;
+}
+
+/* Accesibilidad */
+
+.cc-login__toggle-eye:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* ---------- Error ---------- */
+
+.cc-error {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #f87171;
+
+  background: rgba(248, 113, 113, 0.1);
+
+  border: 1px solid rgba(248, 113, 113, 0.25);
+
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  text-align: center;
+}
+
+/* ---------- Botón submit ---------- */
+
+.cc-btn--calcular {
+  margin-top: 6px;
+
+  width: 100%;
+
+  padding: 12px 16px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #0f0f10;
+
+  background: #f97316;
+
+  border: none;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.05s ease;
+}
+
+.cc-btn--calcular:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.cc-btn--calcular:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.cc-btn--calcular:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+/* ---------- Responsive móvil ---------- */
+
+@media (max-width: 420px) {
+  .cc-login {
+    padding: 20px 14px;
+  }
+
+  .cc-login__home {
+    top: 16px;
+    left: 16px;
+
+    width: 40px;
+    height: 40px;
+  }
+
+  .cc-login__home svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .cc-login__card {
+    padding: 26px 20px;
+
+    border-radius: 14px;
+
+    gap: 12px;
+  }
+
+  .cc-login__title {
+    font-size: 20px;
+  }
+
+  .cc-login__input,
+  .cc-btn--calcular {
+    font-size: 14px;
+
+    padding: 11px 12px;
+  }
+
+  .cc-login__input--password {
+    padding-right: 46px;
+  }
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 768px) {
+  .cc-login__card {
+    padding: 40px 36px;
+  }
+}
