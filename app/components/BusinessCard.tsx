@@ -30,7 +30,7 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
         <p className="cc-business__meta">
           <span>⭐ {negocio.rating.toFixed(1)}</span>
           <span>({negocio.reviews})</span>
-          <span>📍 {negocio.distanciaKm} km</span>
+          <span>📍 {negocio.distanciaKm.toFixed(1)} km</span>
         </p>
         {negocio.badge && <p className="cc-business__badge">{negocio.badge}</p>}
       </div>
