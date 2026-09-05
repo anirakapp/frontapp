@@ -35,7 +35,10 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           <a href="/negocios/registro" className="cc-header__nav-link cc-header__nav-link--cta">
             Registrá tu negocio
           </a>
-          <a href="/admin/login" className="cc-header__nav-link cc-header__nav-link--login">
+          <a href="/register" className="cc-header__nav-link cc-header__nav-link--cta">
+            Registrate
+          </a>
+          <a href="/login" className="cc-header__nav-link cc-header__nav-link--login">
             Ingresar
           </a>
         </nav>
