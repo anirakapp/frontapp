@@ -17,7 +17,6 @@ import { postCalculo, isApiError } from "../lib/api";
 import { DEFAULT_DRINKS } from "../lib/drinksData";
 import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 import type { CalculoResponse, Negocio } from "../lib/types";
-
 interface HomeViewProps {
   ciudad: string;
 }
