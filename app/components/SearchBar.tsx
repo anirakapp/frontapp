@@ -136,7 +136,7 @@ export default function SearchBar({ ciudad, onResultados }: SearchBarProps): Rea
     onResultados([], "");
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
+function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
     if (!mostrarSugerencias || sugerencias.length === 0) return;
 
     if (event.key === "ArrowDown") {
@@ -146,8 +146,11 @@ export default function SearchBar({ ciudad, onResultados }: SearchBarProps): Rea
       event.preventDefault();
       setIndiceActivo((prev) => (prev <= 0 ? sugerencias.length - 1 : prev - 1));
     } else if (event.key === "Enter" && indiceActivo >= 0) {
-      event.preventDefault();
-      seleccionarSugerencia(sugerencias[indiceActivo]);
+      const seleccionada = sugerencias[indiceActivo];
+      if (seleccionada) {
+        event.preventDefault();
+        seleccionarSugerencia(seleccionada);
+      }
     } else if (event.key === "Escape") {
       setMostrarSugerencias(false);
     }
