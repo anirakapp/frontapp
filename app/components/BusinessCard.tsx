@@ -6,7 +6,7 @@ import type { Negocio } from "../lib/types";
 import { formatearDistancia } from "../lib/format";
 import { likeBusiness, unlikeBusiness, isApiError } from "../lib/api";
 import { getToken } from "../lib/auth";
-
+import "../styles/businesscard.css";
 interface BusinessCardProps {
   negocio: Negocio;
 }
