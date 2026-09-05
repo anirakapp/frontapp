@@ -13,6 +13,9 @@ import type {
   RegisterPayload,
   MenuOption,
   DrinkOption,
+  Sugerencia,
+  SearchResponse,
+  RatingResponse,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://appback-six.vercel.app";
@@ -237,4 +240,102 @@ export async function adminAprobarNegocio(token: string, id: string): Promise<Ne
     headers: authHeaders(token),
   });
   return parseJsonOrThrow<Negocio>(res);
+}
+
+/** PATCH /api/negocios/:id/bloquear — admin bloquea un negocio (no lo borra). */
+export async function adminBloquearNegocio(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/bloquear`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+/** PATCH /api/negocios/:id/desbloquear */
+export async function adminDesbloquearNegocio(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/desbloquear`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+/** PATCH /api/negocios/:id/activar */
+export async function adminActivarNegocio(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/activar`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+/** PATCH /api/negocios/:id/desactivar */
+export async function adminDesactivarNegocio(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/desactivar`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+// ---------------- Buscador inteligente ----------------
+
+/** GET /api/search?q=... — buscador por intención, tolerante a errores de tipeo. */
+export async function searchBusinesses(
+  q: string,
+  opts: { ciudad?: string; lat?: number; lng?: number; token?: string } = {}
+): Promise<SearchResponse> {
+  const params = new URLSearchParams({ q });
+  if (opts.ciudad) params.set("ciudad", opts.ciudad);
+  if (opts.lat != null) params.set("lat", String(opts.lat));
+  if (opts.lng != null) params.set("lng", String(opts.lng));
+
+  const res = await fetch(`${API_URL}/api/search?${params.toString()}`, {
+    cache: "no-store",
+    headers: opts.token ? { Authorization: `Bearer ${opts.token}` } : undefined,
+  });
+  return parseJsonOrThrow<SearchResponse>(res);
+}
+
+/** GET /api/search/sugerencias?q=... — autocompletado mientras el usuario escribe. */
+export async function getSugerencias(q: string): Promise<Sugerencia[]> {
+  const res = await fetch(
+    `${API_URL}/api/search/sugerencias?q=${encodeURIComponent(q)}`,
+    { cache: "no-store" }
+  );
+  return parseJsonOrThrow<Sugerencia[]>(res);
+}
+
+// ---------------- Likes y valoraciones ----------------
+
+/** POST /api/negocios/:id/like — requiere login. Backend evita likes duplicados. */
+export async function likeBusiness(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/like`, {
+    method: "POST",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+/** DELETE /api/negocios/:id/like */
+export async function unlikeBusiness(token: string, id: string): Promise<Negocio> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/like`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+  return parseJsonOrThrow<Negocio>(res);
+}
+
+/** POST /api/negocios/:id/rating — valoración de 1 a 5 estrellas. */
+export async function rateBusiness(
+  token: string,
+  id: string,
+  valor: number
+): Promise<RatingResponse> {
+  const res = await fetch(`${API_URL}/api/negocios/${id}/rating`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ valor }),
+  });
+  return parseJsonOrThrow<RatingResponse>(res);
 }
