@@ -7,6 +7,7 @@ import {
   adminGetNegociosPendientes,
   adminAprobarNegocio,
   adminCrearNegocio,
+  adminActualizarNegocio,
   adminEliminarNegocio,
   adminBloquearNegocio,
   adminDesbloquearNegocio,
@@ -41,6 +42,10 @@ export default function AdminDashboardPage() {
   const [palabrasClaveTexto, setPalabrasClaveTexto] = useState("");
   const [ubicando, setUbicando] = useState(false);
   const [creando, setCreando] = useState(false);
+
+  // NUEVO: modo edición. Si editandoId != null, el form edita ese negocio
+  // en vez de crear uno nuevo.
+  const [editandoId, setEditandoId] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
     const token = getToken();
@@ -94,9 +99,12 @@ export default function AdminDashboardPage() {
   async function eliminar(id: string): Promise<void> {
     const token = getToken();
     if (!token) return;
+    if (!window.confirm("¿Seguro que querés eliminar este negocio? Esta acción no se puede deshacer."))
+      return;
     setProcesandoId(id);
     try {
       await adminEliminarNegocio(token, id);
+      if (editandoId === id) cancelarEdicion();
       await cargar();
     } catch (err) {
       setError(isApiError(err) ? err.message : "No pudimos eliminar el negocio.");
@@ -105,9 +113,6 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // NUEVO: bloquear/desbloquear. A diferencia de "eliminar", esto no borra
-  // nada de MongoDB: solo saca al negocio de los resultados públicos y del
-  // buscador hasta que se desbloquee.
   async function alternarBloqueo(negocio: Negocio): Promise<void> {
     const token = getToken();
     if (!token) return;
@@ -152,7 +157,36 @@ export default function AdminDashboardPage() {
     );
   }
 
-  async function crear(event: FormEvent): Promise<void> {
+  // NUEVO: carga los datos de un negocio existente en el form para editarlo.
+  function iniciarEdicion(negocio: Negocio): void {
+    setEditandoId(negocio.id);
+    setNuevo({
+      nombre: negocio.nombre,
+      categoria: negocio.categoria,
+      imagen: negocio.imagen,
+      ciudad: negocio.ciudad,
+      direccion: negocio.direccion ?? "",
+      descripcion: negocio.descripcion ?? "",
+      barrio: negocio.barrio ?? "",
+      telefono: negocio.telefono ?? "",
+      horarios: negocio.horarios ?? "",
+      whatsapp: negocio.whatsapp ?? "",
+      badge: negocio.badge,
+      auspiciado: negocio.auspiciado,
+      lat: negocio.lat ?? undefined,
+      lng: negocio.lng ?? undefined,
+    });
+    setPalabrasClaveTexto((negocio.palabrasClave ?? []).join(", "));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cancelarEdicion(): void {
+    setEditandoId(null);
+    setNuevo(NEGOCIO_VACIO);
+    setPalabrasClaveTexto("");
+  }
+
+  async function guardar(event: FormEvent): Promise<void> {
     event.preventDefault();
     const token = getToken();
     if (!token) return;
@@ -172,12 +206,23 @@ export default function AdminDashboardPage() {
         .map((p) => p.trim())
         .filter(Boolean);
 
-      await adminCrearNegocio(token, { ...nuevo, palabrasClave });
-      setNuevo(NEGOCIO_VACIO);
-      setPalabrasClaveTexto("");
+      if (editandoId) {
+        // NUEVO: edición real de un negocio existente.
+        await adminActualizarNegocio(token, editandoId, { ...nuevo, palabrasClave });
+      } else {
+        await adminCrearNegocio(token, { ...nuevo, palabrasClave });
+      }
+
+      cancelarEdicion();
       await cargar();
     } catch (err) {
-      setError(isApiError(err) ? err.message : "No pudimos crear el negocio.");
+      setError(
+        isApiError(err)
+          ? err.message
+          : editandoId
+          ? "No pudimos guardar los cambios del negocio."
+          : "No pudimos crear el negocio."
+      );
     } finally {
       setCreando(false);
     }
@@ -262,18 +307,20 @@ export default function AdminDashboardPage() {
         </ul>
       ) : (
         <>
-          <form className="cc-dashboard__form" onSubmit={(e) => void crear(e)}>
-            <h2>Nuevo negocio</h2>
+          <form className="cc-dashboard__form" onSubmit={(e) => void guardar(e)}>
+            <h2>{editandoId ? "Editar negocio" : "Nuevo negocio"}</h2>
             <input
               placeholder="Nombre"
               value={nuevo.nombre}
               onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })}
-              required />
+              required
+            />
             <input
               placeholder="Categoría"
               value={nuevo.categoria}
               onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })}
-              required />
+              required
+            />
             <input
               placeholder="Imagen (URL)"
               value={nuevo.imagen}
@@ -295,7 +342,8 @@ export default function AdminDashboardPage() {
             <input
               placeholder="Barrio (opcional)"
               value={nuevo.barrio ?? ""}
-              onChange={(e) => setNuevo({ ...nuevo, barrio: e.target.value })}/>
+              onChange={(e) => setNuevo({ ...nuevo, barrio: e.target.value })}
+            />
             <input
               placeholder="Teléfono (opcional)"
               value={nuevo.telefono ?? ""}
@@ -304,7 +352,8 @@ export default function AdminDashboardPage() {
             <input
               placeholder="Horarios (opcional)"
               value={nuevo.horarios ?? ""}
-              onChange={(e) => setNuevo({ ...nuevo, horarios: e.target.value })} />
+              onChange={(e) => setNuevo({ ...nuevo, horarios: e.target.value })}
+            />
             <input
               placeholder="Descripción (opcional)"
               value={nuevo.descripcion ?? ""}
@@ -320,13 +369,22 @@ export default function AdminDashboardPage() {
               value={nuevo.whatsapp ?? ""}
               onChange={(e) => setNuevo({ ...nuevo, whatsapp: e.target.value })}
             />
+            <label className="cc-dashboard__checkbox">
+              <input
+                type="checkbox"
+                checked={Boolean(nuevo.auspiciado)}
+                onChange={(e) => setNuevo({ ...nuevo, auspiciado: e.target.checked })}
+              />
+              Auspiciado (aparece primero en los listados)
+            </label>
 
             <div className="cc-dashboard__ubicacion">
               <button
                 type="button"
                 className="cc-btn cc-btn--ghost"
                 onClick={capturarUbicacion}
-                disabled={ubicando}>
+                disabled={ubicando}
+              >
                 {ubicando ? "Ubicando…" : "📍 Usar mi ubicación actual"}
               </button>
               {nuevo.lat != null && nuevo.lng != null && (
@@ -334,14 +392,32 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
-            <button type="submit" disabled={creando}>
-              {creando ? "Creando…" : "Crear negocio (queda aprobado)"}
-            </button>
+            <div className="cc-dashboard__form-acciones">
+              <button type="submit" disabled={creando}>
+                {creando
+                  ? "Guardando…"
+                  : editandoId
+                  ? "Guardar cambios"
+                  : "Crear negocio (queda aprobado)"}
+              </button>
+              {editandoId && (
+                <button type="button" className="cc-btn cc-btn--ghost" onClick={cancelarEdicion}>
+                  Cancelar edición
+                </button>
+              )}
+            </div>
           </form>
 
           <ul className="cc-dashboard__lista">
             {todos.map((negocio) => (
-              <li key={negocio.id} className="cc-dashboard__fila">
+              <li
+                key={negocio.id}
+                className={
+                  editandoId === negocio.id
+                    ? "cc-dashboard__fila cc-dashboard__fila--editando"
+                    : "cc-dashboard__fila"
+                }
+              >
                 <div>
                   <p className="cc-dashboard__nombre">{negocio.nombre}</p>
                   <p className="cc-dashboard__meta">
@@ -365,6 +441,14 @@ export default function AdminDashboardPage() {
                     type="button"
                     className="cc-btn cc-btn--ghost"
                     disabled={procesandoId === negocio.id}
+                    onClick={() => iniciarEdicion(negocio)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    className="cc-btn cc-btn--ghost"
+                    disabled={procesandoId === negocio.id}
                     onClick={() => void alternarBloqueo(negocio)}
                   >
                     {negocio.isBlocked ? "Desbloquear" : "Bloquear"}
@@ -373,7 +457,8 @@ export default function AdminDashboardPage() {
                     type="button"
                     className="cc-btn cc-btn--eliminar"
                     disabled={procesandoId === negocio.id}
-                    onClick={() => void eliminar(negocio.id)}>
+                    onClick={() => void eliminar(negocio.id)}
+                  >
                     Eliminar
                   </button>
                 </div>
