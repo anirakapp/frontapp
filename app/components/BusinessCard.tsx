@@ -6,7 +6,6 @@ import { formatearDistancia } from "../lib/format";
 interface BusinessCardProps {
   negocio: Negocio;
 }
-
 export default function BusinessCard({ negocio }: BusinessCardProps): ReactElement {
   return (
     <article className="cc-business">
