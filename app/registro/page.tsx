@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
+import { FiHome, FiChevronDown } from "react-icons/fi";
 import "../styles/register.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://appback-six.vercel.app";
@@ -201,6 +202,17 @@ export default function RegisterPage(): ReactElement {
     <div className="cc-page">
       <main className="cc-main cc-register">
         <div className="cc-card cc-register__card">
+          <button
+            type="button"
+            className="cc-register__home"
+            onClick={() => router.push("/")}
+            aria-label="Volver al inicio"
+            title="Volver al inicio"
+          >
+            <FiHome size={18} />
+            <span>Volver al inicio</span>
+          </button>
+
           <div className="cc-register__intro">
             <h1>Sumá tu negocio</h1>
             <p>
@@ -266,25 +278,35 @@ export default function RegisterPage(): ReactElement {
                     compara. */}
                 <label className="cc-register__campo">
                   <span>Categoría</span>
-                  <select
-                    value={form.categoria}
-                    onChange={(e) => actualizar("categoria", e.target.value)}
-                    required
-                    disabled={categorias.length === 0}
+                  <div
+                    className={
+                      categoriasError
+                        ? "cc-select cc-select--error"
+                        : "cc-select"
+                    }
                   >
-                    <option value="" disabled>
-                      {categoriasError
-                        ? "No se pudieron cargar las categorías"
-                        : categorias.length === 0
-                        ? "Cargando categorías…"
-                        : "Elegí una categoría…"}
-                    </option>
-                    {categorias.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    <select
+                      value={form.categoria}
+                      onChange={(e) => actualizar("categoria", e.target.value)}
+                      required
+                      disabled={categorias.length === 0}
+                      className="cc-select__control"
+                    >
+                      <option value="" disabled>
+                        {categoriasError
+                          ? "No se pudieron cargar las categorías"
+                          : categorias.length === 0
+                          ? "Cargando categorías…"
+                          : "Elegí una categoría…"}
                       </option>
-                    ))}
-                  </select>
+                      {categorias.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown className="cc-select__icon" size={18} aria-hidden="true" />
+                  </div>
                 </label>
 
                 <label className="cc-register__campo">
