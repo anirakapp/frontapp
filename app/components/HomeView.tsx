@@ -15,6 +15,7 @@ import Footer from "./Footer";
 import ResultModal from "./ResultModal";
 import { postCalculo, isApiError } from "../lib/api";
 import { DEFAULT_DRINKS } from "../lib/drinksData";
+import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 import type { CalculoResponse, Negocio } from "../lib/types";
 
 interface HomeViewProps {
@@ -33,6 +34,14 @@ export default function HomeView({ ciudad }: HomeViewProps): ReactElement {
   const [showDrinksError, setShowDrinksError] = useState(false);
   const [resultado, setResultado] = useState<CalculoResponse | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // NUEVO: se llama acá, al montar HomeView, en vez de adentro de
+  // ResultModal. Así el permiso de ubicación, el fix de GPS/red y el fetch
+  // de negocios cercanos corren en paralelo mientras el usuario todavía
+  // está completando personas/menú/bebidas. Para cuando el modal se abre
+  // (después de "Calcular mi compra"), estos datos ya están resueltos o
+  // muy avanzados, en vez de arrancar de cero recién ahí.
+  const negociosCercanosState = useNegociosCercanos();
 
   // NUEVO: resultados del buscador del header.
   const [resultadosBusqueda, setResultadosBusqueda] = useState<Negocio[]>([]);
@@ -173,7 +182,11 @@ export default function HomeView({ ciudad }: HomeViewProps): ReactElement {
       <Footer />
 
       {modalOpen && resultado && (
-        <ResultModal resultado={resultado} onClose={() => setModalOpen(false)} />
+        <ResultModal
+          resultado={resultado}
+          onClose={() => setModalOpen(false)}
+          negociosCercanosState={negociosCercanosState}
+        />
       )}
     </div>
   );
