@@ -709,3 +709,9 @@ body {
     justify-content: space-between;
   }
 }
+
+.cc-business__direccion {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.15rem 0 0;
+}
