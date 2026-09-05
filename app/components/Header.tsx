@@ -18,8 +18,6 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
   const [esAdmin, setEsAdmin] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
 
-  // Se chequea en el cliente (getStoredUser lee localStorage), por eso el
-  // useEffect: en SSR no hay localStorage y siempre arrancaría en false.
   useEffect(() => {
     const user = getStoredUser();
     setLogueado(Boolean(user));
@@ -36,8 +34,6 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
 
   function irAPanel(): void {
     setMenuAbierto(false);
-    // Admin tiene su panel único y separado; user y dueño de negocio
-    // comparten /panel.
     router.push(esAdmin ? "/admin" : "/panel");
   }
 
@@ -59,7 +55,6 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           </span>
         </div>
 
-        {/* Nav de escritorio: se oculta en mobile por CSS (ver header.css) */}
         <nav className="cc-header__nav cc-header__nav--desktop" aria-label="Navegación principal">
           <a href="#como-funciona">Cómo funciona</a>
           <a href="#menus">Menús</a>
@@ -109,7 +104,6 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           <span aria-hidden="true">▾</span>
         </button>
 
-        {/* Botón hamburguesa: solo visible en mobile (ver header.css) */}
         <button
           type="button"
           className="cc-header__menu-toggle"
@@ -122,7 +116,6 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
         </button>
       </div>
 
-      {/* Nav mobile desplegable */}
       {menuAbierto && (
         <nav
           id="cc-header-mobile-nav"
