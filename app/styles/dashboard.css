@@ -1,9 +1,4 @@
-/* styles/dashboard.css
-   Panel de administración de "¿Cuánto Compro?".
-   Reutiliza las variables de marca definidas en :root dentro de
-   styles/homepage.css (--cc-green, --cc-radius, --cc-shadow, etc.).
-   Importar DESPUÉS de homepage.css en app/layout.tsx, o en el layout
-   propio de /admin, para heredar esas variables. */
+/* styles/dashboard.css */
 
 .cc-dashboard {
   max-width: 960px;
@@ -244,4 +239,21 @@
   margin: 4px 0 0;
   font-size: 12px;
   color: #b45309;
+}
+
+.cc-dashboard__fila--editando {
+  border: 1px solid #e8621e;
+  background: #fff7f2;
+}
+
+.cc-dashboard__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.cc-dashboard__form-acciones {
+  display: flex;
+  gap: 0.6rem;
 }
