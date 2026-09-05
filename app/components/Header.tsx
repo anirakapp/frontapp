@@ -32,7 +32,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           <a href="#menus">Menús</a>
           <a href="#negocios">Ofertas cerca</a>
           <span className="cc-header__nav-divider" aria-hidden="true" />
-          <a href="/register" className="cc-header__nav-link cc-header__nav-link--cta">
+          <a href="/negocios/registro" className="cc-header__nav-link cc-header__nav-link--cta">
             Registrá tu negocio
           </a>
           <a href="/admin/login" className="cc-header__nav-link cc-header__nav-link--login">
