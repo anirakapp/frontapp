@@ -1,0 +1,120 @@
+.cc-searchbar {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+}
+
+.cc-searchbar__form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 999px;
+  padding: 0.4rem 0.6rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.cc-searchbar__icon {
+  font-size: 0.95rem;
+  opacity: 0.6;
+  padding-left: 0.35rem;
+}
+
+.cc-searchbar__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.2rem;
+  min-width: 0;
+}
+
+.cc-searchbar__clear,
+.cc-searchbar__location {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 999px;
+  opacity: 0.65;
+}
+
+.cc-searchbar__clear:hover,
+.cc-searchbar__location:hover {
+  opacity: 1;
+  background: #f2f2f2;
+}
+
+.cc-searchbar__location--activa {
+  opacity: 1;
+  background: #fef1e8;
+}
+
+.cc-searchbar__submit {
+  border: none;
+  background: #e8621e;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cc-searchbar__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cc-searchbar__sugerencias {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem;
+  z-index: 20;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.cc-searchbar__sugerencia {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.cc-searchbar__sugerencia--activa,
+.cc-searchbar__sugerencia:hover {
+  background: #fef1e8;
+}
+
+.cc-searchbar__sugerencia-categoria {
+  font-size: 0.75rem;
+  opacity: 0.55;
+  text-transform: capitalize;
+}
+
+.cc-searchbar__error {
+  margin: 0.4rem 0 0 0.6rem;
+  font-size: 0.8rem;
+  color: #c0392b;
+}
+
+@media (max-width: 640px) {
+  .cc-searchbar__submit span {
+    display: none;
+  }
+}
