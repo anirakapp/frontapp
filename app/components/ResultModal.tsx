@@ -9,10 +9,6 @@ import "../styles/resultmodal.css";
 interface ResultModalProps {
   resultado: CalculoResponse;
   onClose: () => void;
-  // NUEVO: el hook ya no se llama acá adentro, se recibe resuelto (o en
-  // progreso) desde HomeView, que lo dispara al montar la página en vez de
-  // esperar a que se abra este modal. Así el permiso de ubicación + fetch
-  // de negocios corren en paralelo con el resto del formulario.
   negociosCercanosState: ReturnType<typeof useNegociosCercanos>;
 }
 
