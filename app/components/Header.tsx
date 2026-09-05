@@ -1,6 +1,10 @@
-import type { ReactElement } from "react";
+"use client";
+
+import { useEffect, useState, type ReactElement } from "react";
+import { useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
 import type { Negocio } from "../lib/types";
+import { getStoredUser, clearSession, isAdmin } from "../lib/auth";
 import "../styles/header.css";
 
 interface HeaderProps {
@@ -9,6 +13,34 @@ interface HeaderProps {
 }
 
 export default function Header({ ciudad, onResultados }: HeaderProps): ReactElement {
+  const router = useRouter();
+  const [logueado, setLogueado] = useState(false);
+  const [esAdmin, setEsAdmin] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  // Se chequea en el cliente (getStoredUser lee localStorage), por eso el
+  // useEffect: en SSR no hay localStorage y siempre arrancaría en false.
+  useEffect(() => {
+    const user = getStoredUser();
+    setLogueado(Boolean(user));
+    setEsAdmin(isAdmin());
+  }, []);
+
+  function handleLogout(): void {
+    clearSession();
+    setLogueado(false);
+    setEsAdmin(false);
+    setMenuAbierto(false);
+    router.push("/");
+  }
+
+  function irAPanel(): void {
+    setMenuAbierto(false);
+    // Admin tiene su panel único y separado; user y dueño de negocio
+    // comparten /panel.
+    router.push(esAdmin ? "/admin" : "/panel");
+  }
+
   return (
     <header className="cc-header">
       <div className="cc-header__top">
@@ -27,7 +59,8 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           </span>
         </div>
 
-        <nav className="cc-header__nav" aria-label="Navegación principal">
+        {/* Nav de escritorio: se oculta en mobile por CSS (ver header.css) */}
+        <nav className="cc-header__nav cc-header__nav--desktop" aria-label="Navegación principal">
           <a href="#como-funciona">Cómo funciona</a>
           <a href="#menus">Menús</a>
           <a href="#negocios">Ofertas cerca</a>
@@ -35,12 +68,34 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           <a href="/registro" className="cc-header__nav-link cc-header__nav-link--cta">
             Registrá tu negocio
           </a>
-          <a href="/register" className="cc-header__nav-link cc-header__nav-link--cta">
-            Registrate
-          </a>
-          <a href="/login" className="cc-header__nav-link cc-header__nav-link--login">
-            Ingresar
-          </a>
+
+          {logueado ? (
+            <>
+              <button
+                type="button"
+                className="cc-header__nav-link cc-header__nav-link--panel"
+                onClick={irAPanel}
+              >
+                Panel
+              </button>
+              <button
+                type="button"
+                className="cc-header__nav-link cc-header__nav-link--login"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <a href="/register" className="cc-header__nav-link cc-header__nav-link--cta">
+                Registrate
+              </a>
+              <a href="/login" className="cc-header__nav-link cc-header__nav-link--login">
+                Ingresar
+              </a>
+            </>
+          )}
         </nav>
 
         <button type="button" className="cc-header__ciudad">
@@ -53,7 +108,81 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           <span>{ciudad}</span>
           <span aria-hidden="true">▾</span>
         </button>
+
+        {/* Botón hamburguesa: solo visible en mobile (ver header.css) */}
+        <button
+          type="button"
+          className="cc-header__menu-toggle"
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuAbierto}
+          aria-controls="cc-header-mobile-nav"
+          onClick={() => setMenuAbierto((v) => !v)}
+        >
+          <span aria-hidden="true">{menuAbierto ? "✕" : "☰"}</span>
+        </button>
       </div>
+
+      {/* Nav mobile desplegable */}
+      {menuAbierto && (
+        <nav
+          id="cc-header-mobile-nav"
+          className="cc-header__nav cc-header__nav--mobile"
+          aria-label="Navegación mobile"
+        >
+          <a href="#como-funciona" onClick={() => setMenuAbierto(false)}>
+            Cómo funciona
+          </a>
+          <a href="#menus" onClick={() => setMenuAbierto(false)}>
+            Menús
+          </a>
+          <a href="#negocios" onClick={() => setMenuAbierto(false)}>
+            Ofertas cerca
+          </a>
+          
+            href="/registro"
+            className="cc-header__nav-link--cta"
+            onClick={() => setMenuAbierto(false)}
+          >
+            Registrá tu negocio
+          </a>
+
+          {logueado ? (
+            <>
+              <button
+                type="button"
+                className="cc-header__nav-link--panel"
+                onClick={irAPanel}
+              >
+                Panel
+              </button>
+              <button
+                type="button"
+                className="cc-header__nav-link--login"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              
+                href="/register"
+                className="cc-header__nav-link--cta"
+                onClick={() => setMenuAbierto(false)}
+              >
+                Registrate
+              </a>
+              
+                href="/login"
+                className="cc-header__nav-link--login"
+                onClick={() => setMenuAbierto(false)}
+              >
+                Ingresar
+              </a>
+            </>
+          )}
+        </nav>
+      )}
 
       <div className="cc-header__search-row">
         <SearchBar ciudad={ciudad} onResultados={onResultados} />
