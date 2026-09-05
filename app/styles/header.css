@@ -257,3 +257,59 @@
     margin-top: 12px;
   }
 }
+/* ---------- Nav mobile desplegable ---------- */
+.cc-header__nav--mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 12px 4px 4px;
+  margin-top: 8px;
+  border-top: 1px solid var(--cc-border);
+}
+
+.cc-header__nav--mobile a,
+.cc-header__nav--mobile button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--cc-text);
+}
+
+.cc-header__nav--mobile .cc-header__nav-link--cta {
+  background: var(--cc-green);
+  color: var(--cc-white);
+  font-weight: 700;
+}
+
+.cc-header__nav--mobile .cc-header__nav-link--login,
+.cc-header__nav--mobile .cc-header__nav-link--panel {
+  border: 1px solid var(--cc-green);
+  color: var(--cc-green-dark);
+}
+
+/* ---------- Botón hamburguesa ---------- */
+.cc-header__menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--cc-border);
+  border-radius: 8px;
+  background: var(--cc-white);
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Se oculta en desktop, donde ya está el nav completo */
+@media (min-width: 768px) {
+  .cc-header__menu-toggle {
+    display: none;
+  }
+}
