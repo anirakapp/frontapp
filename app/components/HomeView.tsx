@@ -126,7 +126,7 @@ export default function HomeView({ ciudad }: HomeViewProps): ReactElement {
           <SummarySidebar personas={personas} resultado={resultado} loading={loading} />
         </div>
 
-        <BusinessesSection ciudad={ciudad} />
+       <BusinessesSection />
         <SponsorBanner />
       </main>
 
