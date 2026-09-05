@@ -1,5 +1,6 @@
 "use client";
 import { useState, type ReactElement } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { Negocio } from "../lib/types";
 import { formatearDistancia } from "../lib/format";
@@ -11,21 +12,25 @@ interface BusinessCardProps {
 }
 
 export default function BusinessCard({ negocio }: BusinessCardProps): ReactElement {
+  const router = useRouter();
   const [liked, setLiked] = useState(Boolean(negocio.likeadoPorMi));
   const [likes, setLikes] = useState(negocio.likes ?? 0);
   const [procesando, setProcesando] = useState(false);
 
+  function irALogin(): void {
+    const next = typeof window !== "undefined" ? window.location.pathname : "/";
+    router.push(`/login?next=${encodeURIComponent(next)}`);
+  }
+
   async function handleLike(): Promise<void> {
     const token = getToken();
     if (!token) {
-      // Ajustá esta ruta a donde tengas el login de usuarios (no el de admin).
-      window.location.href = "/login";
+      irALogin();
       return;
     }
     if (procesando) return;
 
     setProcesando(true);
-    // Optimista: actualizamos ya, y si falla, revertimos.
     const likedAntes = liked;
     const likesAntes = likes;
     setLiked(!likedAntes);
@@ -41,7 +46,7 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
       setLiked(likedAntes);
       setLikes(likesAntes);
       if (isApiError(err) && (err.status === 401 || err.status === 403)) {
-        window.location.href = "/login";
+        irALogin();
       }
     } finally {
       setProcesando(false);
