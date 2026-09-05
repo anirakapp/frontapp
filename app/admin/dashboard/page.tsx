@@ -9,6 +9,8 @@ import {
   adminAprobarNegocio,
   adminCrearNegocio,
   adminEliminarNegocio,
+  adminBloquearNegocio,
+  adminDesbloquearNegocio,
   isApiError,
 } from "../../lib/api";
 import { getToken, isAdmin, clearSession } from "../../lib/auth";
@@ -22,6 +24,10 @@ const NEGOCIO_VACIO: NegocioInput = {
   imagen: "",
   ciudad: "",
   direccion: "",
+  descripcion: "",
+  barrio: "",
+  telefono: "",
+  horarios: "",
 };
 
 export default function AdminDashboardPage() {
@@ -33,6 +39,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [procesandoId, setProcesandoId] = useState<string | null>(null);
   const [nuevo, setNuevo] = useState<NegocioInput>(NEGOCIO_VACIO);
+  const [palabrasClaveTexto, setPalabrasClaveTexto] = useState("");
   const [ubicando, setUbicando] = useState(false);
   const [creando, setCreando] = useState(false);
 
@@ -99,6 +106,27 @@ export default function AdminDashboardPage() {
     }
   }
 
+  // NUEVO: bloquear/desbloquear. A diferencia de "eliminar", esto no borra
+  // nada de MongoDB: solo saca al negocio de los resultados públicos y del
+  // buscador hasta que se desbloquee.
+  async function alternarBloqueo(negocio: Negocio): Promise<void> {
+    const token = getToken();
+    if (!token) return;
+    setProcesandoId(negocio.id);
+    try {
+      if (negocio.isBlocked) {
+        await adminDesbloquearNegocio(token, negocio.id);
+      } else {
+        await adminBloquearNegocio(token, negocio.id);
+      }
+      await cargar();
+    } catch (err) {
+      setError(isApiError(err) ? err.message : "No pudimos cambiar el estado del negocio.");
+    } finally {
+      setProcesandoId(null);
+    }
+  }
+
   function capturarUbicacion(): void {
     setError(null);
 
@@ -140,8 +168,14 @@ export default function AdminDashboardPage() {
 
     setCreando(true);
     try {
-      await adminCrearNegocio(token, nuevo);
+      const palabrasClave = palabrasClaveTexto
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      await adminCrearNegocio(token, { ...nuevo, palabrasClave });
       setNuevo(NEGOCIO_VACIO);
+      setPalabrasClaveTexto("");
       await cargar();
     } catch (err) {
       setError(isApiError(err) ? err.message : "No pudimos crear el negocio.");
@@ -235,14 +269,12 @@ export default function AdminDashboardPage() {
               placeholder="Nombre"
               value={nuevo.nombre}
               onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })}
-              required
-            />
+              required />
             <input
               placeholder="Categoría"
               value={nuevo.categoria}
               onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })}
-              required
-            />
+              required />
             <input
               placeholder="Imagen (URL)"
               value={nuevo.imagen}
@@ -262,6 +294,29 @@ export default function AdminDashboardPage() {
               required
             />
             <input
+              placeholder="Barrio (opcional)"
+              value={nuevo.barrio ?? ""}
+              onChange={(e) => setNuevo({ ...nuevo, barrio: e.target.value })}/>
+            <input
+              placeholder="Teléfono (opcional)"
+              value={nuevo.telefono ?? ""}
+              onChange={(e) => setNuevo({ ...nuevo, telefono: e.target.value })}
+            />
+            <input
+              placeholder="Horarios (opcional)"
+              value={nuevo.horarios ?? ""}
+              onChange={(e) => setNuevo({ ...nuevo, horarios: e.target.value })} />
+            <input
+              placeholder="Descripción (opcional)"
+              value={nuevo.descripcion ?? ""}
+              onChange={(e) => setNuevo({ ...nuevo, descripcion: e.target.value })}
+            />
+            <input
+              placeholder="Palabras clave, separadas por coma (ej: aceite, aceite de girasol)"
+              value={palabrasClaveTexto}
+              onChange={(e) => setPalabrasClaveTexto(e.target.value)}
+            />
+            <input
               placeholder="WhatsApp (opcional)"
               value={nuevo.whatsapp ?? ""}
               onChange={(e) => setNuevo({ ...nuevo, whatsapp: e.target.value })}
@@ -272,8 +327,7 @@ export default function AdminDashboardPage() {
                 type="button"
                 className="cc-btn cc-btn--ghost"
                 onClick={capturarUbicacion}
-                disabled={ubicando}
-              >
+                disabled={ubicando}>
                 {ubicando ? "Ubicando…" : "📍 Usar mi ubicación actual"}
               </button>
               {nuevo.lat != null && nuevo.lng != null && (
@@ -295,6 +349,11 @@ export default function AdminDashboardPage() {
                     {negocio.categoria} · {negocio.ciudad}
                     {negocio.direccion ? ` · ${negocio.direccion}` : ""} ·{" "}
                     <strong>{negocio.habilitado ? "Habilitado" : "Pendiente"}</strong>
+                    {negocio.isBlocked && <strong> · Bloqueado</strong>}
+                  </p>
+                  <p className="cc-dashboard__meta">
+                    ❤️ {negocio.likes ?? 0} · ⭐ {negocio.rating.toFixed(1)} ({negocio.reviews}) ·{" "}
+                    {negocio.cantidadProductos ?? 0} producto(s)
                   </p>
                   {negocio.lat == null || negocio.lng == null ? (
                     <p className="cc-dashboard__aviso">
@@ -305,10 +364,17 @@ export default function AdminDashboardPage() {
                 <div className="cc-dashboard__acciones">
                   <button
                     type="button"
+                    className="cc-btn cc-btn--ghost"
+                    disabled={procesandoId === negocio.id}
+                    onClick={() => void alternarBloqueo(negocio)}
+                  >
+                    {negocio.isBlocked ? "Desbloquear" : "Bloquear"}
+                  </button>
+                  <button
+                    type="button"
                     className="cc-btn cc-btn--eliminar"
                     disabled={procesandoId === negocio.id}
-                    onClick={() => void eliminar(negocio.id)}
-                  >
+                    onClick={() => void eliminar(negocio.id)}>
                     Eliminar
                   </button>
                 </div>
