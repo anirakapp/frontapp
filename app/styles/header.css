@@ -1,57 +1,73 @@
-/* styles/header.css */
+/*styles/header.css*/
+
+/* ---------- Header (contenedor general) ---------- */
 .cc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 24px;
-  background: var(--cc-white);
-  border-bottom: 1px solid var(--cc-border);
   position: sticky;
   top: 0;
   z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--cc-white);
+  border-bottom: 1px solid var(--cc-border);
+  padding: 12px 16px;
   transition: box-shadow 0.2s ease;
 }
 
-.cc-busqueda-resultados__header {
+.cc-header * {
+  box-sizing: border-box;
+  min-width: 0; /* evita que flex-children fuercen overflow por texto largo */
+}
+
+/* ---------- Fila superior: brand + nav + ciudad ---------- */
+.cc-header__top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 8px 12px;
 }
+
+/* ---------- Marca / logo ---------- */
 .cc-header__brand {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 700;
   line-height: 1.1;
-  font-size: 15px;
+  font-size: 13px;
+  flex-shrink: 0;
 }
 
 .cc-header__logo {
-  font-size: 22px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .cc-header__logo-img {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   object-fit: cover;
   display: block;
   border-radius: 8px;
 }
 
+.cc-header__title {
+  white-space: nowrap;
+}
+
 /* ---------- Nav ---------- */
 .cc-header__nav {
-  display: none;
+  display: none; /* en mobile se oculta: ver .cc-header__ciudad y CTAs en su lugar */
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   font-size: 14px;
+  flex-wrap: wrap;
 }
 
 .cc-header__nav a {
   color: var(--cc-text);
   text-decoration: none;
+  white-space: nowrap;
   transition: color 0.15s ease;
 }
 
@@ -70,6 +86,7 @@
   height: 20px;
   background: var(--cc-border);
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .cc-header__nav-link {
@@ -114,14 +131,14 @@
 .cc-header__ciudad {
   display: flex;
   align-items: center;
-  flex-direction: row;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
   white-space: nowrap;
   border: 1px solid var(--cc-border);
   background: var(--cc-white);
   border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 13px;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -141,32 +158,102 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
+  max-width: 80px;
 }
 
 .cc-header__ubicacion {
-  width: 42px;
-  height: 42px;
+  width: 28px;
+  height: 28px;
   object-fit: cover;
   border-radius: 50%;
   display: block;
   flex-shrink: 0;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 767px) {
+/* ---------- Fila del buscador ---------- */
+.cc-header__search-row {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* ---------- Encabezado de resultados de búsqueda ---------- */
+.cc-busqueda-resultados__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+/* ============================================================
+   Responsive — mobile-first: lo de arriba es la base para
+   pantallas chicas; a partir de acá solo se agranda/ordena.
+   ============================================================ */
+
+/* Tablet chica: empieza a haber más aire */
+@media (min-width: 480px) {
   .cc-header {
-    padding: 12px 16px;
-    gap: 8px;
+    padding: 14px 20px;
+  }
+
+  .cc-header__brand {
+    font-size: 14px;
+  }
+
+  .cc-header__logo-img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .cc-header__ciudad {
+    padding: 8px 14px;
+    font-size: 14px;
   }
 
   .cc-header__ciudad span {
-    max-width: 90px;
+    max-width: 120px;
+  }
+
+  .cc-header__ubicacion {
+    width: 36px;
+    height: 36px;
   }
 }
 
+/* Desktop: aparece el nav y todo entra en una sola línea */
 @media (min-width: 768px) {
+  .cc-header {
+    padding: 16px 24px;
+  }
+
+  .cc-header__top {
+    flex-wrap: nowrap;
+  }
+
+  .cc-header__brand {
+    font-size: 15px;
+  }
+
+  .cc-header__logo-img {
+    width: 60px;
+    height: 60px;
+  }
+
   .cc-header__nav {
     display: flex;
+  }
+
+  .cc-header__ciudad span {
+    max-width: 140px;
+  }
+
+  .cc-header__ubicacion {
+    width: 42px;
+    height: 42px;
+  }
+
+  .cc-header__search-row {
+    margin-top: 12px;
   }
 }
