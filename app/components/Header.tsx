@@ -132,7 +132,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
             Ofertas cerca
           </a>
           
-            href="/registro"
+            <a href="/registro"
             className="cc-header__nav-link--cta"
             onClick={() => setMenuAbierto(false)}
           >
