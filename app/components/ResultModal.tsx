@@ -4,6 +4,7 @@ import { useRef, useState, useMemo, type ReactElement } from "react";
 import type { CalculoResponse, Negocio } from "../lib/types";
 import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 import { categoriasRelevantes } from "../lib/categoriasNegocio";
+import "../styles/resultmodal.css";
 
 interface ResultModalProps {
   resultado: CalculoResponse;
@@ -367,61 +368,6 @@ export default function ResultModal({
           </p>
         )}
       </div>
-
-      <style jsx>{`
-        .cc-modal__actions {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          padding: 12px 16px 16px;
-        }
-
-        .cc-modal__actions-row {
-          display: flex;
-          gap: 8px;
-        }
-
-        .cc-modal__actions-row .cc-btn {
-          flex: 1 1 0;
-          min-width: 0;
-          padding: 10px 10px;
-          font-size: 14px;
-          line-height: 1.2;
-          border-radius: 10px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .cc-btn--link {
-          background: transparent;
-          border: none;
-          padding: 6px;
-          font-size: 13px;
-          text-decoration: underline;
-          align-self: center;
-        }
-
-        .cc-modal__negocios-nota {
-          font-size: 13px;
-          opacity: 0.75;
-          margin-bottom: 8px;
-        }
-
-        .cc-negocio-card__direccion {
-          display: block;
-          font-size: 12px;
-          color: var(--cc-text-muted);
-          margin-top: 2px;
-        }
-
-        @media (max-width: 420px) {
-          .cc-modal__actions-row .cc-btn {
-            font-size: 13px;
-            padding: 9px 6px;
-          }
-        }
-      `}</style>
     </div>
   );
 }
