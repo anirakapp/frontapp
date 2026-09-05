@@ -159,7 +159,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
           ) : (
             <>
               
-                href="/register"
+               <a href="/register"
                 className="cc-header__nav-link--cta"
                 onClick={() => setMenuAbierto(false)}
               >
