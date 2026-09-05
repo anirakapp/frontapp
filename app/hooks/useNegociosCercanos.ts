@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import type { Negocio } from "../lib/types";
 import { fetchNegociosCercanos } from "../lib/api";
@@ -24,14 +23,11 @@ function distanciaHaversineM(
 ): number {
   const R = 6371000; // radio de la Tierra en metros
   const rad = (deg: number) => (deg * Math.PI) / 180;
-
   const dLat = rad(lat2 - lat1);
   const dLon = rad(lon2 - lon1);
-
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
-
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
@@ -70,7 +66,6 @@ export function useNegociosCercanos(): NegociosCercanosState {
       ({ coords }) => {
         const { latitude, longitude } = coords;
         const previa = ultimaPosicionFetch.current;
-
         const moviste = previa
           ? distanciaHaversineM(previa.lat, previa.lon, latitude, longitude)
           : Infinity; // primera lectura: siempre buscamos
@@ -86,7 +81,6 @@ export function useNegociosCercanos(): NegociosCercanosState {
 
         // Te moviste bastante (o es la primera vez): volvemos a pedir negocios.
         ultimaPosicionFetch.current = { lat: latitude, lon: longitude };
-
         setState((prev) => ({ ...prev, loading: prev.negocios.length === 0 }));
 
         void fetchNegociosCercanos(latitude, longitude)
@@ -107,7 +101,13 @@ export function useNegociosCercanos(): NegociosCercanosState {
           );
       },
       () => setState({ negocios: [], loading: false, error: null, sinUbicacion: true }),
-      { enableHighAccuracy: false, timeout: 8000 }
+      // maximumAge: 60000 -> si el navegador ya tiene una posición de hace
+      // menos de 1 minuto (por ejemplo, la que ya diste al tocar "usar mi
+      // ubicación" en el buscador o en el registro), la reusa al toque en
+      // vez de forzar un fix de GPS/red nuevo. Esto es lo que más tiempo
+      // se estaba comiendo antes de siquiera llegar a pedirle algo al
+      // backend.
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
     );
 
     return () => {
