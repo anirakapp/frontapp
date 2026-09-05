@@ -2,16 +2,15 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiEye, FiEyeOff, FiHome } from "react-icons/fi";
-import { register, isApiError } from "../lib/api";
+import { login, isApiError } from "../lib/api";
 import { saveSession } from "../lib/auth";
 import "../styles/loginuser.css";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
 
-  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,19 +20,13 @@ export default function RegisterPage() {
   async function handleSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
     setError(null);
-
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
-
     setLoading(true);
     try {
-      const { token, user } = await register({ nombre, email, password });
+      const { token, user } = await login({ email, password });
       saveSession(token, user);
       router.push(next);
     } catch (err) {
-      setError(isApiError(err) ? err.message : "No pudimos crear la cuenta.");
+      setError(isApiError(err) ? err.message : "No pudimos iniciar sesión.");
     } finally {
       setLoading(false);
     }
@@ -52,18 +45,8 @@ export default function RegisterPage() {
       </button>
 
       <form className="cc-login__card" onSubmit={(e) => void handleSubmit(e)}>
-        <h1 className="cc-login__title">Creá tu cuenta</h1>
-        <p className="cc-login__hint">Registrate para dar like y valorar negocios.</p>
-
-        <input
-          type="text"
-          className="cc-login__input"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          autoFocus
-          required
-        />
+        <h1 className="cc-login__title">Iniciar sesión</h1>
+        <p className="cc-login__hint">Ingresá con tu cuenta para dar like y valorar negocios.</p>
 
         <input
           type="email"
@@ -71,6 +54,7 @@ export default function RegisterPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoFocus
           required
         />
 
@@ -78,11 +62,10 @@ export default function RegisterPage() {
           <input
             type={showPassword ? "text" : "password"}
             className="cc-login__input cc-login__input--password"
-            placeholder="Contraseña (mínimo 6 caracteres)"
+            placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            minLength={6}
           />
           <button
             type="button"
@@ -102,13 +85,13 @@ export default function RegisterPage() {
         )}
 
         <button type="submit" className="cc-btn cc-btn--calcular" disabled={loading}>
-          {loading ? "Creando cuenta…" : "Crear cuenta"}
+          {loading ? "Ingresando…" : "Ingresar"}
         </button>
 
         <p className="cc-login__switch">
-          ¿Ya tenés cuenta?{" "}
-          <a href={`/login${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>
-            Ingresá
+          ¿No tenés cuenta?{" "}
+          <a href={`/register${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>
+            Registrate
           </a>
         </p>
       </form>
