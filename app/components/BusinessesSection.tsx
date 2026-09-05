@@ -7,7 +7,6 @@ import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 export default function BusinessesSection(): ReactElement {
   const { negocios, loading, error, sinUbicacion } = useNegociosCercanos();
   const habilitados = negocios.filter((n) => n.habilitado);
-
   return (
     <section className="cc-negocios" id="negocios" aria-labelledby="negocios-heading">
       <div className="cc-negocios__header">
