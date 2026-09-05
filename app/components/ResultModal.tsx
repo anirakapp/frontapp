@@ -2,13 +2,18 @@
 
 import { useRef, useState, useMemo, type ReactElement } from "react";
 import type { CalculoResponse, Negocio } from "../lib/types";
-import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
+import type { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 import { categoriasRelevantes } from "../lib/categoriasNegocio";
 import "../styles/resultmodal.css";
 
 interface ResultModalProps {
   resultado: CalculoResponse;
   onClose: () => void;
+  // NUEVO: el hook ya no se llama acá adentro, se recibe resuelto (o en
+  // progreso) desde HomeView, que lo dispara al montar la página en vez de
+  // esperar a que se abra este modal. Así el permiso de ubicación + fetch
+  // de negocios corren en paralelo con el resto del formulario.
+  negociosCercanosState: ReturnType<typeof useNegociosCercanos>;
 }
 
 function normalizarWhatsapp(numero: string | undefined): string | null {
@@ -33,6 +38,7 @@ function ordenarPorPromoYDistancia(negocios: Negocio[]): Negocio[] {
 export default function ResultModal({
   resultado,
   onClose,
+  negociosCercanosState,
 }: ResultModalProps): ReactElement {
   const captureRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +51,7 @@ export default function ResultModal({
     loading: cargandoNegocios,
     error: errorNegocios,
     sinUbicacion,
-  } = useNegociosCercanos();
+  } = negociosCercanosState;
 
   const {
     negociosMostrados,
