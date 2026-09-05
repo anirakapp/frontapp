@@ -1,8 +1,4 @@
-/* styles/register.css
-   Formulario público "Sumá tu negocio".
-   Reutiliza las variables de marca de :root definidas en homepage.css
-   (--cc-green, --cc-radius, --cc-shadow, --cc-border, --cc-text-muted...).
-   Importar DESPUÉS de homepage.css. */
+/* styles/register.css*/
 
 .cc-register {
   display: flex;
@@ -213,4 +209,86 @@
     margin: 32px auto;
     padding: 32px 20px;
   }
+}
+
+/* ============================================================
+   AGREGAR ESTO a styles/register.css
+   (botón "volver a home" + select de categoría con mejor calidad visual)
+   ============================================================ */
+
+.cc-register__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  padding: 0.35rem 0;
+  margin-bottom: 1rem;
+  color: var(--cc-text-muted, #6b7280);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.cc-register__home:hover {
+  color: var(--cc-primary, #16a34a);
+}
+
+.cc-register__home svg {
+  flex-shrink: 0;
+}
+
+/* --- Select de categoría ------------------------------------------- */
+
+.cc-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cc-select__control {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  border: 1px solid var(--cc-border, #d1d5db);
+  border-radius: 0.5rem;
+  padding: 0.65rem 2.25rem 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  color: var(--cc-text, #111827);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cc-select__control:hover:not(:disabled) {
+  border-color: var(--cc-primary, #16a34a);
+}
+
+.cc-select__control:focus {
+  outline: none;
+  border-color: var(--cc-primary, #16a34a);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.cc-select__control:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.cc-select__icon {
+  position: absolute;
+  right: 0.75rem;
+  pointer-events: none;
+  color: var(--cc-text-muted, #6b7280);
+}
+
+.cc-select--error .cc-select__control {
+  border-color: #dc2626;
+}
+
+.cc-select--error .cc-select__icon {
+  color: #dc2626;
 }
