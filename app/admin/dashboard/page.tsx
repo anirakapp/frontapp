@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { Negocio, NegocioInput } from "../../lib/types";
