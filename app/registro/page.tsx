@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, type FormEvent, type ReactElement } from "react";
+import { useEffect, useState, type FormEvent, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
 import "../styles/register.css";
 
@@ -41,6 +40,23 @@ export default function RegisterPage(): ReactElement {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [listo, setListo] = useState(false);
+
+  // NUEVO: categorías estándar traídas del backend (derivadas del
+  // DICCIONARIO que usa el buscador), para reemplazar el input libre por
+  // un select y garantizar que lo que se guarda coincide con lo que
+  // searchModel.js compara.
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categoriasError, setCategoriasError] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/categorias`)
+      .then((res) => {
+        if (!res.ok) throw new Error("No se pudieron cargar las categorías");
+        return res.json();
+      })
+      .then((data) => setCategorias(data.categorias || []))
+      .catch(() => setCategoriasError(true));
+  }, []);
 
   function actualizar<K extends keyof FormState>(campo: K, valor: string): void {
     setForm((actual) => ({ ...actual, [campo]: valor }));
@@ -242,15 +258,35 @@ export default function RegisterPage(): ReactElement {
                     required
                   />
                 </label>
+
+                {/* NUEVO: select en lugar de input libre. Las opciones vienen
+                    del backend (CATEGORIAS_ESTANDAR, derivadas del mismo
+                    DICCIONARIO que usa el buscador), así el valor guardado
+                    en la base siempre coincide con lo que searchModel.js
+                    compara. */}
                 <label className="cc-register__campo">
                   <span>Categoría</span>
-                  <input
+                  <select
                     value={form.categoria}
                     onChange={(e) => actualizar("categoria", e.target.value)}
-                    placeholder="Almacén, carnicería, bebidas…"
                     required
-                  />
+                    disabled={categorias.length === 0}
+                  >
+                    <option value="" disabled>
+                      {categoriasError
+                        ? "No se pudieron cargar las categorías"
+                        : categorias.length === 0
+                        ? "Cargando categorías…"
+                        : "Elegí una categoría…"}
+                    </option>
+                    {categorias.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </option>
+                    ))}
+                  </select>
                 </label>
+
                 <label className="cc-register__campo">
                   <span>Ciudad</span>
                   <input
