@@ -6,7 +6,6 @@ import { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 
 export default function BusinessesSection(): ReactElement {
   const { negocios, loading, error, sinUbicacion } = useNegociosCercanos();
-
   const habilitados = negocios.filter((n) => n.habilitado);
 
   return (
