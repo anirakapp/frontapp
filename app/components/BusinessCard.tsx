@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import Image from "next/image";
 import type { Negocio } from "../lib/types";
 import { formatearDistancia } from "../lib/format";
+
 interface BusinessCardProps {
   negocio: Negocio;
 }
@@ -22,6 +23,9 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
           <span>⭐ {negocio.rating.toFixed(1)}</span>
           <span>({negocio.reviews})</span>
           <span>📍 {formatearDistancia(negocio.distanciaKm)}</span>
+        </p>
+        <p className="cc-business__direccion">
+          {negocio.direccion ? negocio.direccion : "Dirección no cargada"}
         </p>
         {negocio.badge && <p className="cc-business__badge">{negocio.badge}</p>}
       </div>
