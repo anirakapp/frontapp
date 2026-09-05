@@ -40,10 +40,12 @@ function recalcularDistancias(
   lat: number,
   lon: number
 ): Negocio[] {
-  return negocios.map((n) => ({
-    ...n,
-    distanciaKm: distanciaHaversineM(lat, lon, n.lat, n.lng) / 1000,
-  }));
+  return negocios
+    .filter((n): n is Negocio & { lat: number; lng: number } => n.lat != null && n.lng != null)
+    .map((n) => ({
+      ...n,
+      distanciaKm: distanciaHaversineM(lat, lon, n.lat, n.lng) / 1000,
+    }));
 }
 
 export function useNegociosCercanos(): NegociosCercanosState {
