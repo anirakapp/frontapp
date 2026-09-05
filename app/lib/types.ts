@@ -58,6 +58,24 @@ export interface Negocio {
   habilitado: boolean;
   whatsapp?: string;
   ownerId: string | null;
+
+  // --- NUEVO: buscador inteligente / likes / reputación / moderación ---
+  descripcion?: string;
+  barrio?: string;
+  telefono?: string;
+  horarios?: string;
+  /** Palabras clave propias del negocio (además de las que ya vienen del diccionario del buscador). */
+  palabrasClave?: string[];
+  /** Si el negocio está activo (lo puede apagar el dueño o el admin). No confundir con "habilitado" (aprobación). */
+  activo?: boolean;
+  /** Si el admin lo bloqueó. Un negocio bloqueado no aparece en público ni en el buscador, pero no se borra. */
+  isBlocked?: boolean;
+  /** Cantidad total de likes (desnormalizado en el backend). */
+  likes?: number;
+  /** Si el usuario logueado actual ya le dio like (solo viene si mandaste el token). */
+  likeadoPorMi?: boolean;
+  /** Cantidad de productos cargados (solo lo devuelve el panel admin). */
+  cantidadProductos?: number;
 }
 
 export interface ApiError {
@@ -96,4 +114,36 @@ export interface RegisterPayload {
 // sin dirección/lat/lng no puede aparecer en el listado de "cercanos".
 export type NegocioInput = Pick<Negocio, "nombre" | "categoria" | "imagen" | "ciudad"> &
   Required<Pick<Negocio, "direccion">> &
-  Partial<Pick<Negocio, "badge" | "lat" | "lng" | "whatsapp" | "auspiciado">>;
+  Partial<
+    Pick<
+      Negocio,
+      | "badge"
+      | "lat"
+      | "lng"
+      | "whatsapp"
+      | "auspiciado"
+      | "descripcion"
+      | "barrio"
+      | "telefono"
+      | "horarios"
+      | "palabrasClave"
+    >
+  >;
+
+// --- NUEVO: tipos del buscador inteligente ---
+
+export interface Sugerencia {
+  texto: string;
+  categoria: string;
+}
+
+export interface SearchResponse {
+  query: string;
+  resultados: Negocio[];
+  sugerenciaVacia: boolean;
+}
+
+export interface RatingResponse {
+  rating: number;
+  reviews: number;
+}
