@@ -3,6 +3,8 @@
 import { useEffect, useState, type FormEvent, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
 import { getToken, saveSession, isAdmin } from "../lib/auth";
+import Header from "../components/Header";
+import type { Negocio } from "../lib/types";
 import "../styles/panel.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://appback-six.vercel.app/api";
@@ -343,24 +345,43 @@ export default function PanelPage(): ReactElement {
     }
   }
 
+  // El panel no tiene su propia sección de resultados de búsqueda (eso vive
+  // en HomeView). Si alguien busca desde el Header estando en /panel, lo
+  // mandamos al home; ahí no tenemos forma de pasarle los resultados ya
+  // calculados sin agregar estado global, así que simplemente navega y
+  // el usuario puede volver a buscar en el home si hace falta.
+  function handleResultadosBusqueda(_resultados: Negocio[], query: string): void {
+    if (query.trim()) {
+      router.push("/");
+    }
+  }
+
   if (cargando) {
     return (
-      <main className="cc-panel">
-        <p className="cc-panel__estado">Cargando tu panel…</p>
-      </main>
+      <>
+        <Header ciudad="Rosario" onResultados={handleResultadosBusqueda} />
+        <main className="cc-panel">
+          <p className="cc-panel__estado">Cargando tu panel…</p>
+        </main>
+      </>
     );
   }
 
   if (error && !usuario) {
     return (
-      <main className="cc-panel">
-        <p className="cc-panel__estado cc-panel__estado--error">{error}</p>
-      </main>
+      <>
+        <Header ciudad="Rosario" onResultados={handleResultadosBusqueda} />
+        <main className="cc-panel">
+          <p className="cc-panel__estado cc-panel__estado--error">{error}</p>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="cc-panel">
+    <>
+      <Header ciudad="Rosario" onResultados={handleResultadosBusqueda} />
+      <main className="cc-panel">
       <h1 className="cc-panel__titulo">Mi panel</h1>
 
       <section className="cc-panel__card">
@@ -500,6 +521,7 @@ export default function PanelPage(): ReactElement {
           </div>
         ))}
       </section>
-    </main>
+      </main>
+    </>
   );
 }
