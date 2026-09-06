@@ -321,36 +321,45 @@
   min-height: auto;
 }
 
-/* Botón flotante "hay más abajo": solo en pantallas anchas (en mobile el
-   modal ya se ve completo sin necesidad de esto). z-index mayor al de
-   .cc-modal__actions para que no quede tapado por esa barra, y un bottom
-   más alto para despegarlo bien por encima de los botones de abajo. */
+/* Botón flotante "hay más abajo": visible en todos los tamaños de
+   pantalla. El reset explícito (padding:0, border:none, box-sizing,
+   aspect-ratio) es necesario porque los estilos nativos del navegador
+   para <button> agregan padding/line-height que deformaban el círculo
+   (se veía ovalado/chato en vez de redondo). */
 .cc-modal__scroll-hint {
-  display: none;
+  position: sticky;
+  align-self: flex-end;
+  right: 16px;
+  margin-right: 16px;
+  width: 40px;
+  height: 40px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0;
+  margin-top: 0;
+  border: none;
+  border-radius: 50%;
+  background: #1f8a4c;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: 0 2px 8px rgba(31, 138, 76, 0.4);
+  cursor: pointer;
+  z-index: 6;
+  animation: cc-scroll-hint-bounce 1.4s ease-in-out infinite;
 }
 
-@media (min-width: 700px) {
+@media (max-width: 480px) {
   .cc-modal__scroll-hint {
-    position: sticky;
-    align-self: flex-end;
-    /* bottom se aplica por JS (inline style), calculado a partir de la
-       altura real medida de .cc-modal__actions, para que nunca pueda
-       quedar encima de Descargar/Compartir/Volver a editar. */
-    right: 16px;
-    margin-right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: #1f8a4c;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(31, 138, 76, 0.4);
-    cursor: pointer;
-    z-index: 6;
-    animation: cc-scroll-hint-bounce 1.4s ease-in-out infinite;
+    width: 36px;
+    height: 36px;
+    right: 12px;
+    margin-right: 12px;
   }
 }
 
