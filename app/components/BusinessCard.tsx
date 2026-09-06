@@ -80,6 +80,9 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
         <p className="cc-business__direccion">
           {negocio.direccion ? negocio.direccion : "Dirección no cargada"}
         </p>
+        <p className="cc-business__direccion">
+          {negocio.horarios ? negocio.horarios : "No cargados"}
+        </p>
         <p className="cc-business__telefono">
           📞 {negocio.whatsapp ? negocio.whatsapp : "No proporcionado"}
         </p>
