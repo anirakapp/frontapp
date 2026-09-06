@@ -12,6 +12,9 @@ import {
   adminEliminarNegocio,
   adminBloquearNegocio,
   adminDesbloquearNegocio,
+  adminGetDiccionario,
+  adminCrearCategoriaDiccionario,
+  adminAgregarPalabrasClave,
   isApiError,
 } from "../../lib/api";
 import { getToken, isAdmin, clearSession } from "../../lib/auth";
@@ -19,7 +22,13 @@ import "../../styles/dashboard.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://appback-six.vercel.app";
 
-type Tab = "pendientes" | "todos";
+type Tab = "pendientes" | "todos" | "diccionario";
+
+type EntradaDiccionario = {
+  clave: string;
+  categoria: string;
+  palabras: string[];
+};
 
 const NEGOCIO_VACIO: NegocioInput = {
   nombre: "",
@@ -46,26 +55,36 @@ export default function AdminDashboardPage() {
   const [ubicando, setUbicando] = useState(false);
   const [creando, setCreando] = useState(false);
 
-  // Modo edición. Si editandoId != null, el form edita ese negocio
-  // en vez de crear uno nuevo.
   const [editandoId, setEditandoId] = useState<string | null>(null);
 
-  // NUEVO: categorías estándar, traídas del mismo endpoint que usa
-  // RegisterPage.tsx (derivadas de CATEGORIAS_ESTANDAR en el backend).
-  // Así el admin no puede tipear una categoría libre que no exista en el
-  // DICCIONARIO del buscador — el select garantiza que siempre coincide.
   const [categorias, setCategorias] = useState<string[]>([]);
   const [categoriasError, setCategoriasError] = useState(false);
 
-  useEffect(() => {
+  // NUEVO: gestión del diccionario (categorías + palabras clave) desde el admin.
+  const [diccionario, setDiccionario] = useState<EntradaDiccionario[]>([]);
+  const [diccionarioCargado, setDiccionarioCargado] = useState(false);
+  const [nuevaCategoria, setNuevaCategoria] = useState("");
+  const [nuevaCategoriaPalabras, setNuevaCategoriaPalabras] = useState("");
+  const [guardandoCategoria, setGuardandoCategoria] = useState(false);
+  const [palabrasPorClave, setPalabrasPorClave] = useState<Record<string, string>>({});
+  const [guardandoPalabrasClave, setGuardandoPalabrasClave] = useState<string | null>(null);
+
+  const cargarCategorias = useCallback(() => {
     fetch(`${API_URL}/api/categorias`)
       .then((res) => {
         if (!res.ok) throw new Error("No se pudieron cargar las categorías");
         return res.json();
       })
-      .then((data) => setCategorias(data.categorias || []))
+      .then((data) => {
+        setCategorias(data.categorias || []);
+        setCategoriasError(false);
+      })
       .catch(() => setCategoriasError(true));
   }, []);
+
+  useEffect(() => {
+    cargarCategorias();
+  }, [cargarCategorias]);
 
   const cargar = useCallback(async () => {
     const token = getToken();
@@ -94,6 +113,18 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
+  const cargarDiccionario = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await adminGetDiccionario(token);
+      setDiccionario(data.entradas);
+      setDiccionarioCargado(true);
+    } catch (err) {
+      setError(isApiError(err) ? err.message : "No pudimos cargar el diccionario.");
+    }
+  }, []);
+
   useEffect(() => {
     if (!isAdmin()) {
       router.push("/admin/login");
@@ -101,6 +132,60 @@ export default function AdminDashboardPage() {
     }
     void cargar();
   }, [cargar, router]);
+
+  useEffect(() => {
+    if (tab === "diccionario" && !diccionarioCargado) {
+      void cargarDiccionario();
+    }
+  }, [tab, diccionarioCargado, cargarDiccionario]);
+
+  async function crearCategoriaDiccionario(event: FormEvent): Promise<void> {
+    event.preventDefault();
+    const token = getToken();
+    if (!token || !nuevaCategoria.trim()) return;
+
+    setGuardandoCategoria(true);
+    try {
+      const palabras = nuevaCategoriaPalabras
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      await adminCrearCategoriaDiccionario(token, { categoria: nuevaCategoria.trim(), palabras });
+
+      setNuevaCategoria("");
+      setNuevaCategoriaPalabras("");
+      await cargarDiccionario();
+      cargarCategorias(); // así el select de "Nuevo negocio" ve la categoría al toque
+    } catch (err) {
+      setError(isApiError(err) ? err.message : "No pudimos crear la categoría.");
+    } finally {
+      setGuardandoCategoria(false);
+    }
+  }
+
+  async function agregarPalabrasAEntrada(clave: string): Promise<void> {
+    const token = getToken();
+    if (!token) return;
+
+    const texto = palabrasPorClave[clave] || "";
+    const palabras = texto
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (palabras.length === 0) return;
+
+    setGuardandoPalabrasClave(clave);
+    try {
+      await adminAgregarPalabrasClave(token, clave, palabras);
+      setPalabrasPorClave((actual) => ({ ...actual, [clave]: "" }));
+      await cargarDiccionario();
+    } catch (err) {
+      setError(isApiError(err) ? err.message : "No pudimos agregar las palabras clave.");
+    } finally {
+      setGuardandoPalabrasClave(null);
+    }
+  }
 
   async function aprobar(id: string): Promise<void> {
     const token = getToken();
@@ -177,7 +262,6 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Carga los datos de un negocio existente en el form para editarlo.
   function iniciarEdicion(negocio: Negocio): void {
     setEditandoId(negocio.id);
     setNuevo({
@@ -276,6 +360,13 @@ export default function AdminDashboardPage() {
         >
           Todos ({todos.length})
         </button>
+        <button
+          type="button"
+          className={tab === "diccionario" ? "cc-tab cc-tab--activo" : "cc-tab"}
+          onClick={() => setTab("diccionario")}
+        >
+          Diccionario
+        </button>
       </div>
 
       {error && (
@@ -284,7 +375,7 @@ export default function AdminDashboardPage() {
         </p>
       )}
 
-      {loading ? (
+      {loading && tab !== "diccionario" ? (
         <p>Cargando…</p>
       ) : tab === "pendientes" ? (
         <ul className="cc-dashboard__lista">
@@ -324,6 +415,60 @@ export default function AdminDashboardPage() {
             </li>
           ))}
         </ul>
+      ) : tab === "diccionario" ? (
+        <div className="cc-dashboard__diccionario">
+          <form className="cc-dashboard__form" onSubmit={(e) => void crearCategoriaDiccionario(e)}>
+            <h2>Nueva categoría</h2>
+            <input
+              placeholder="Nombre de la categoría (ej: heladería)"
+              value={nuevaCategoria}
+              onChange={(e) => setNuevaCategoria(e.target.value)}
+              required
+            />
+            <input
+              placeholder="Palabras clave, separadas por coma (ej: helado, heladeria)"
+              value={nuevaCategoriaPalabras}
+              onChange={(e) => setNuevaCategoriaPalabras(e.target.value)}
+            />
+            <button type="submit" disabled={guardandoCategoria}>
+              {guardandoCategoria ? "Creando…" : "Crear categoría"}
+            </button>
+          </form>
+
+          {!diccionarioCargado ? (
+            <p>Cargando diccionario…</p>
+          ) : (
+            <ul className="cc-dashboard__lista">
+              {diccionario.map((entrada) => (
+                <li key={entrada.clave} className="cc-dashboard__fila">
+                  <div>
+                    <p className="cc-dashboard__nombre">{entrada.categoria}</p>
+                    <p className="cc-dashboard__meta">
+                      {entrada.palabras.length > 0 ? entrada.palabras.join(", ") : "Sin palabras clave"}
+                    </p>
+                  </div>
+                  <div className="cc-dashboard__acciones">
+                    <input
+                      placeholder="Agregar palabras, separadas por coma"
+                      value={palabrasPorClave[entrada.clave] ?? ""}
+                      onChange={(e) =>
+                        setPalabrasPorClave((actual) => ({ ...actual, [entrada.clave]: e.target.value }))
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="cc-btn cc-btn--ghost"
+                      disabled={guardandoPalabrasClave === entrada.clave}
+                      onClick={() => void agregarPalabrasAEntrada(entrada.clave)}
+                    >
+                      {guardandoPalabrasClave === entrada.clave ? "Guardando…" : "Agregar"}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
         <>
           <form className="cc-dashboard__form" onSubmit={(e) => void guardar(e)}>
@@ -335,10 +480,6 @@ export default function AdminDashboardPage() {
               required
             />
 
-            {/* Categoría: select en vez de input libre, mismo endpoint
-                /api/categorias que usa RegisterPage.tsx. Así lo que carga
-                el admin siempre coincide con CATEGORIAS_ESTANDAR del
-                backend, sin depender de que tipee bien. */}
             <div className={categoriasError ? "cc-select cc-select--error" : "cc-select"}>
               <select
                 value={nuevo.categoria}
