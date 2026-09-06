@@ -369,3 +369,14 @@
   gap: 0.6rem;
   flex-wrap: wrap;
 }
+.cc-dashboard__ubicacion {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.cc-dashboard__form-acciones {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cc-border);
+}
