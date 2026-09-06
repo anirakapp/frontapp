@@ -7,6 +7,7 @@ import { formatearDistancia } from "../lib/format";
 import { likeBusiness, unlikeBusiness, isApiError } from "../lib/api";
 import { getToken } from "../lib/auth";
 import "../styles/businesscard.css";
+
 interface BusinessCardProps {
   negocio: Negocio;
 }
@@ -29,13 +30,11 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
       return;
     }
     if (procesando) return;
-
     setProcesando(true);
     const likedAntes = liked;
     const likesAntes = likes;
     setLiked(!likedAntes);
     setLikes(likedAntes ? likesAntes - 1 : likesAntes + 1);
-
     try {
       const actualizado = likedAntes
         ? await unlikeBusiness(token, negocio.id)
@@ -75,10 +74,14 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
           <span>⭐ {negocio.rating.toFixed(1)}</span>
           <span>({negocio.reviews})</span>
           <span>📍 {formatearDistancia(negocio.distanciaKm)}</span>
-          {likes > 0 && <span>❤️ {likes}</span>}
+          {/* Likes: siempre visible, incluso en 0, no solo cuando empieza el conteo */}
+          <span>❤️ {likes}</span>
         </p>
         <p className="cc-business__direccion">
           {negocio.direccion ? negocio.direccion : "Dirección no cargada"}
+        </p>
+        <p className="cc-business__telefono">
+          📞 {negocio.whatsapp ? negocio.whatsapp : "No proporcionado"}
         </p>
         {negocio.badge && <p className="cc-business__badge">{negocio.badge}</p>}
       </div>
