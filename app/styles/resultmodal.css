@@ -7,8 +7,6 @@
   justify-content: center;
   align-items: flex-start;
   padding: 24px 16px;
-  /* usamos dvh para evitar el bug de 100vh en Safari/Chrome mobile
-     (la barra de direcciones "come" altura y tapa contenido) */
   height: 100vh;
   height: 100dvh;
 }
@@ -19,9 +17,6 @@
   background: rgba(20, 24, 26, 0.55);
 }
 
-/* El panel es AHORA el único contenedor con scroll.
-   flex column + overflow-y:auto adentro, en vez de tener
-   scroll en .cc-modal Y overflow:hidden en el panel al mismo tiempo. */
 .cc-modal__panel {
   position: relative;
   width: 100%;
@@ -148,7 +143,6 @@
   margin-bottom: 8px;
 }
 
-/* Las cards van una al lado de la otra, con scroll horizontal si no entran */
 .cc-negocios-list {
   display: flex;
   gap: 12px;
@@ -164,6 +158,7 @@
   flex: 0 0 auto;
   scroll-snap-align: start;
   width: 220px;
+  max-width: 80vw;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -179,11 +174,13 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .cc-negocio-card__nombre {
   font-size: 14px;
   font-weight: 700;
+  overflow-wrap: break-word;
 }
 
 .cc-negocio-card__direccion {
@@ -191,6 +188,7 @@
   font-size: 12px;
   color: var(--cc-text-muted, #6b7280);
   margin-top: 2px;
+  overflow-wrap: break-word;
 }
 
 .cc-negocio-card__chips {
@@ -226,6 +224,11 @@
   color: #3b4bcb;
 }
 
+.cc-chip--likes {
+  background: #fdf2f4;
+  color: #be123c;
+}
+
 .cc-negocio-card__sin-whatsapp {
   font-size: 11px;
   color: #6b7280;
@@ -238,7 +241,7 @@
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  min-height: 44px; /* tamaño de toque cómodo en mobile */
+  min-height: 44px;
 }
 
 .cc-btn:disabled {
@@ -277,9 +280,7 @@
   flex-shrink: 0;
 }
 
-/* ===== Acciones del pie (descargar / compartir / volver) =====
-   Sticky al fondo del panel: siempre visibles aunque el usuario
-   no haya scrolleado hasta el final. */
+/* ===== Acciones del pie (descargar / compartir / volver) ===== */
 .cc-modal__actions {
   position: sticky;
   bottom: 0;
