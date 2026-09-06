@@ -40,6 +40,7 @@ export default function ResultModal({
   const captureRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const negociosRef = useRef<HTMLElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
 
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
@@ -48,6 +49,25 @@ export default function ResultModal({
   // Indicador de "hay más para ver acá abajo": se oculta solo una vez que
   // el usuario ya scrolleó cerca del final del panel.
   const [mostrarIndicadorScroll, setMostrarIndicadorScroll] = useState(true);
+
+  // Altura real de la barra de acciones (Descargar/Compartir/Volver a
+  // editar), medida en vez de adivinada, para que el botón flotante nunca
+  // pueda quedar encima de esos botones sin importar cuánto midan.
+  const [alturaAcciones, setAlturaAcciones] = useState(96);
+
+  useEffect(() => {
+    const actions = actionsRef.current;
+    if (!actions) return;
+
+    function medir() {
+      if (actions) setAlturaAcciones(actions.getBoundingClientRect().height);
+    }
+
+    medir();
+    const observer = new ResizeObserver(medir);
+    observer.observe(actions);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const panel = panelRef.current;
@@ -366,7 +386,7 @@ export default function ResultModal({
         {/* ==================================================
             ESTO NO SE CAPTURA
             ================================================== */}
-        <div className="cc-modal__actions">
+        <div className="cc-modal__actions" ref={actionsRef}>
           <div className="cc-modal__actions-row">
             <button
               type="button"
@@ -401,14 +421,11 @@ export default function ResultModal({
             {downloadError}
           </p>
         )}
-
-        {/* Indicador flotante: avisa que hay más contenido (los negocios)
-            más abajo, y al tocarlo baja directo ahí. Se oculta solo cuando
-            el usuario ya scrolleó cerca del final del panel. */}
         {mostrarIndicadorScroll && (
           <button
             type="button"
             className="cc-modal__scroll-hint"
+            style={{ bottom: alturaAcciones + 16 }}
             onClick={irANegocios}
             aria-label="Ver negocios cerca tuyo"
           >
