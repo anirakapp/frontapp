@@ -28,6 +28,7 @@
   gap: 8px;
   border-bottom: 1px solid var(--cc-border);
   margin-bottom: 24px;
+  overflow-x: auto;
 }
 
 .cc-tab {
@@ -41,6 +42,7 @@
   border-bottom: 2px solid transparent;
   transform: translateY(1px);
   transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
 }
 
 .cc-tab:hover {
@@ -74,15 +76,25 @@
   gap: 10px;
 }
 
+/* Contenedor de cada tarjeta: en escritorio info + acciones en una fila.
+   flex-wrap: wrap es la clave para que en mobile las acciones bajen a su
+   propia línea DENTRO de la tarjeta, en vez de desbordarse hacia afuera. */
 .cc-dashboard__fila {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   background: var(--cc-white);
   border-radius: var(--cc-radius);
   box-shadow: var(--cc-shadow);
   padding: 16px 18px;
+  overflow: hidden; /* corta cualquier hijo que intente desbordar */
+}
+
+.cc-dashboard__fila > div:first-child {
+  flex: 1 1 220px;
+  min-width: 0; /* permite que el texto largo haga wrap/ellipsis en vez de forzar ancho */
 }
 
 .cc-dashboard__nombre {
@@ -90,20 +102,27 @@
   font-size: 15px;
   font-weight: 700;
   color: var(--cc-text);
+  overflow-wrap: break-word;
 }
 
 .cc-dashboard__meta {
   margin: 0;
   font-size: 13px;
   color: var(--cc-text-muted);
+  overflow-wrap: break-word;
 }
 
 .cc-dashboard__meta strong {
   color: var(--cc-green-dark);
 }
 
+/* Acciones: en escritorio quedan a la derecha en una fila; en mobile pasan
+   a ocupar todo el ancho y se acomodan en su propia línea debajo del
+   contenido, en vez de salirse de la tarjeta (el bug que viste en la
+   captura). */
 .cc-dashboard__acciones {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   flex-shrink: 0;
 }
@@ -117,6 +136,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.05s ease;
+  white-space: nowrap;
 }
 
 .cc-btn:hover {
@@ -141,6 +161,12 @@
   background: var(--cc-white);
   color: #c0392b;
   border: 1px solid #f0c4bf;
+}
+
+.cc-btn--ghost {
+  background: transparent;
+  color: var(--cc-text-muted);
+  border: 1px solid var(--cc-border);
 }
 
 /* Botón "Cerrar sesión" del header: estilo ghost por defecto */
@@ -174,6 +200,8 @@
   border-radius: 10px;
   font-size: 14px;
   background: var(--cc-bg);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cc-dashboard__form input:focus {
@@ -199,6 +227,60 @@
   cursor: progress;
 }
 
+/* ---------- Select de categoría (mismo componente visual que en register.css) ---------- */
+.cc-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cc-select__control {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--cc-bg);
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
+  padding: 10px 2.25rem 10px 12px;
+  font-size: 14px;
+  color: var(--cc-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.cc-select__control:hover:not(:disabled) {
+  border-color: var(--cc-green);
+}
+
+.cc-select__control:focus {
+  outline: none;
+  border-color: var(--cc-green);
+  background-color: var(--cc-white);
+}
+
+.cc-select__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cc-select__icon {
+  position: absolute;
+  right: 0.75rem;
+  pointer-events: none;
+  color: var(--cc-text-muted);
+}
+
+.cc-select--error .cc-select__control {
+  border-color: #c0392b;
+}
+
+.cc-select--error .cc-select__icon {
+  color: #c0392b;
+}
+
 /* ---------- Responsive ---------- */
 @media (min-width: 640px) {
   .cc-dashboard__form {
@@ -221,11 +303,40 @@
   }
 }
 
+/* Mobile: la tarjeta pasa a columna (info arriba, acciones abajo del todo,
+   ocupando todo el ancho). Esto es lo que corrige el bug de la captura,
+   donde "Eliminar" quedaba visualmente afuera del borde blanco de la card. */
+@media (max-width: 640px) {
+  .cc-dashboard {
+    padding: 20px 12px 48px;
+  }
+
+  .cc-dashboard__header {
+    flex-wrap: wrap;
+  }
+
+  .cc-dashboard__fila {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cc-dashboard__acciones {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .cc-dashboard__acciones .cc-btn {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
 /* ---------- Bloque de ubicación (lat/lng) en el alta de negocio ---------- */
 .cc-dashboard__ubicacion {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .cc-dashboard__ubicacion-ok {
@@ -256,4 +367,5 @@
 .cc-dashboard__form-acciones {
   display: flex;
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
