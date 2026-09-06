@@ -13,6 +13,7 @@ interface UsuarioPanel {
   email: string;
   role: string;
   avatarUrl: string | null;
+  telefono: string | null;
 }
 
 interface NegocioPropio {
@@ -49,6 +50,12 @@ type NegocioFormData = Partial
     | "whatsapp"
   >
 >;
+
+interface PerfilFormData {
+  nombre: string;
+  telefono: string;
+  avatarUrl: string;
+}
 
 const NEGOCIO_FORM_VACIO: NegocioFormData = {
   nombre: "",
@@ -175,9 +182,17 @@ export default function PanelPage(): ReactElement {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [guardandoAvatar, setGuardandoAvatar] = useState(false);
-  const [avatarMensaje, setAvatarMensaje] = useState<string | null>(null);
+  // --- Perfil: nombre + teléfono + avatar, todo en un solo form ---------
+  // Coincide con lo que acepta PATCH /auth/me en authController.actualizarPerfil
+  // (nombre, telefono, avatarUrl). El endpoint viejo "/auth/avatar" no existe
+  // en authRoutes.js, por eso se unificó acá.
+  const [formPerfil, setFormPerfil] = useState<PerfilFormData>({
+    nombre: "",
+    telefono: "",
+    avatarUrl: "",
+  });
+  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
+  const [perfilMensaje, setPerfilMensaje] = useState<string | null>(null);
 
   const [negocioEnEdicion, setNegocioEnEdicion] = useState<string | null>(null);
   const [formNegocio, setFormNegocio] = useState<NegocioFormData>(NEGOCIO_FORM_VACIO);
@@ -205,7 +220,11 @@ export default function PanelPage(): ReactElement {
       try {
         const meData = await apiFetch("/auth/me");
         setUsuario(meData.user);
-        setAvatarUrl(meData.user.avatarUrl || "");
+        setFormPerfil({
+          nombre: meData.user.nombre || "",
+          telefono: meData.user.telefono || "",
+          avatarUrl: meData.user.avatarUrl || "",
+        });
 
         const negociosData = await apiFetch("/negocios/propios");
         setNegocios(negociosData);
@@ -219,25 +238,43 @@ export default function PanelPage(): ReactElement {
     cargar();
   }, [router]);
 
-  async function handleGuardarAvatar(e: FormEvent): Promise<void> {
+  // --- Guardar perfil (nombre + teléfono + avatar) -----------------------
+
+  async function handleGuardarPerfil(e: FormEvent): Promise<void> {
     e.preventDefault();
-    setGuardandoAvatar(true);
-    setAvatarMensaje(null);
+
+    if (!formPerfil.nombre.trim()) {
+      setPerfilMensaje("El nombre no puede estar vacío.");
+      return;
+    }
+    if (formPerfil.avatarUrl && !/^https?:\/\/.+/i.test(formPerfil.avatarUrl)) {
+      setPerfilMensaje("La URL del avatar no es válida.");
+      return;
+    }
+
+    setGuardandoPerfil(true);
+    setPerfilMensaje(null);
     try {
-      const data = await apiFetch("/auth/avatar", {
+      // PATCH /auth/me (authRoutes.js) -> authController.actualizarPerfil,
+      // que ya acepta nombre, telefono y avatarUrl en un solo request.
+      const data = await apiFetch("/auth/me", {
         method: "PATCH",
-        body: JSON.stringify({ avatarUrl: avatarUrl.trim() || null }),
+        body: JSON.stringify({
+          nombre: formPerfil.nombre.trim(),
+          telefono: formPerfil.telefono.trim() || null,
+          avatarUrl: formPerfil.avatarUrl.trim() || null,
+        }),
       });
       setUsuario(data.user);
 
       const token = getToken();
       if (token) saveSession(token, data.user);
 
-      setAvatarMensaje("Avatar actualizado.");
+      setPerfilMensaje("Perfil actualizado.");
     } catch (err) {
-      setAvatarMensaje(err instanceof Error ? err.message : "No se pudo actualizar el avatar");
+      setPerfilMensaje(err instanceof Error ? err.message : "No se pudo actualizar el perfil");
     } finally {
-      setGuardandoAvatar(false);
+      setGuardandoPerfil(false);
     }
   }
 
@@ -259,6 +296,7 @@ export default function PanelPage(): ReactElement {
     setGuardandoCreacion(true);
     setCreacionMensaje(null);
     try {
+      // POST /negocios/registro (negociosRoutes.js, requireAuth) -> existe.
       const nuevo = await apiFetch("/negocios/registro", {
         method: "POST",
         body: JSON.stringify(formNuevoNegocio),
@@ -302,6 +340,13 @@ export default function PanelPage(): ReactElement {
     setGuardandoNegocio(true);
     setNegocioMensaje(null);
     try {
+      // TODO (backend): PUT /negocios/propios/:id NO existe todavía en
+      // negociosRoutes.js — solo hay PUT /negocios/:id con requireAdmin.
+      // Hay que agregar algo como:
+      //   router.put("/propios/:id", requireAuth, negociosController.actualizarPropio);
+      // que en el controller verifique que negocio.ownerId === req.user.id
+      // antes de aplicar los cambios (si no, cualquier dueño podría editar
+      // el negocio de otro con solo cambiar el id en la URL).
       const actualizado = await apiFetch(`/negocios/propios/${id}`, {
         method: "PUT",
         body: JSON.stringify(formNegocio),
@@ -326,6 +371,9 @@ export default function PanelPage(): ReactElement {
 
     setDandoBaja(id);
     try {
+      // TODO (backend): mismo caso que arriba. DELETE /negocios/propios/:id
+      // no existe todavía — solo DELETE /negocios/:id con requireAdmin.
+      // Hace falta una ruta análoga protegida por dueño, no por admin.
       await apiFetch(`/negocios/propios/${id}`, { method: "DELETE" });
       setNegocios((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
@@ -359,7 +407,7 @@ export default function PanelPage(): ReactElement {
         <h2>Mi perfil</h2>
         <div className="cc-panel__perfil">
           <img
-            src={avatarUrl || "/assets/avatar-default.png"}
+            src={formPerfil.avatarUrl || "/assets/avatar-default.png"}
             alt="Avatar"
             className="cc-panel__avatar"
           />
@@ -369,19 +417,45 @@ export default function PanelPage(): ReactElement {
           </div>
         </div>
 
-        <form className="cc-panel__form" onSubmit={handleGuardarAvatar}>
-          <label htmlFor="avatarUrl">URL de tu nuevo avatar</label>
+        <form className="cc-panel__form" onSubmit={handleGuardarPerfil}>
+          <label htmlFor="perfilNombre">Nombre</label>
           <input
-            id="avatarUrl"
+            id="perfilNombre"
+            type="text"
+            placeholder="Tu nombre y apellido"
+            value={formPerfil.nombre}
+            onChange={(e) =>
+              setFormPerfil((prev) => ({ ...prev, nombre: e.target.value }))
+            }
+            required
+          />
+
+          <label htmlFor="perfilTelefono">Teléfono</label>
+          <input
+            id="perfilTelefono"
+            type="tel"
+            placeholder="341 555-5555"
+            value={formPerfil.telefono}
+            onChange={(e) =>
+              setFormPerfil((prev) => ({ ...prev, telefono: e.target.value }))
+            }
+          />
+
+          <label htmlFor="perfilAvatar">URL de tu avatar</label>
+          <input
+            id="perfilAvatar"
             type="url"
             placeholder="https://ejemplo.com/mi-foto.jpg"
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
+            value={formPerfil.avatarUrl}
+            onChange={(e) =>
+              setFormPerfil((prev) => ({ ...prev, avatarUrl: e.target.value }))
+            }
           />
-          <button type="submit" className="cc-panel__boton" disabled={guardandoAvatar}>
-            {guardandoAvatar ? "Guardando…" : "Guardar avatar"}
+
+          <button type="submit" className="cc-panel__boton" disabled={guardandoPerfil}>
+            {guardandoPerfil ? "Guardando…" : "Guardar cambios"}
           </button>
-          {avatarMensaje && <p className="cc-panel__mensaje">{avatarMensaje}</p>}
+          {perfilMensaje && <p className="cc-panel__mensaje">{perfilMensaje}</p>}
         </form>
       </section>
 
