@@ -152,6 +152,19 @@
   white-space: nowrap;
 }
 
+.cc-business__horarios {
+   margin: 0;
+  font-size: 0.82rem;
+  font-weight: bold;
+  background-color: #ff7a00;
+  color: #000000;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .cc-business__badge {
   margin: 0.15rem 0 0;
   display: inline-block;
