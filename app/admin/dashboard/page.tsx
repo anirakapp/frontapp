@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { FiChevronDown } from "react-icons/fi";
 import type { Negocio, NegocioInput } from "../../lib/types";
 import {
   adminGetNegociosTodos,
@@ -15,6 +16,8 @@ import {
 } from "../../lib/api";
 import { getToken, isAdmin, clearSession } from "../../lib/auth";
 import "../../styles/dashboard.css";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://appback-six.vercel.app";
 
 type Tab = "pendientes" | "todos";
 
@@ -43,9 +46,26 @@ export default function AdminDashboardPage() {
   const [ubicando, setUbicando] = useState(false);
   const [creando, setCreando] = useState(false);
 
-  // NUEVO: modo edición. Si editandoId != null, el form edita ese negocio
+  // Modo edición. Si editandoId != null, el form edita ese negocio
   // en vez de crear uno nuevo.
   const [editandoId, setEditandoId] = useState<string | null>(null);
+
+  // NUEVO: categorías estándar, traídas del mismo endpoint que usa
+  // RegisterPage.tsx (derivadas de CATEGORIAS_ESTANDAR en el backend).
+  // Así el admin no puede tipear una categoría libre que no exista en el
+  // DICCIONARIO del buscador — el select garantiza que siempre coincide.
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categoriasError, setCategoriasError] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/categorias`)
+      .then((res) => {
+        if (!res.ok) throw new Error("No se pudieron cargar las categorías");
+        return res.json();
+      })
+      .then((data) => setCategorias(data.categorias || []))
+      .catch(() => setCategoriasError(true));
+  }, []);
 
   const cargar = useCallback(async () => {
     const token = getToken();
@@ -157,7 +177,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // NUEVO: carga los datos de un negocio existente en el form para editarlo.
+  // Carga los datos de un negocio existente en el form para editarlo.
   function iniciarEdicion(negocio: Negocio): void {
     setEditandoId(negocio.id);
     setNuevo({
@@ -207,7 +227,6 @@ export default function AdminDashboardPage() {
         .filter(Boolean);
 
       if (editandoId) {
-        // NUEVO: edición real de un negocio existente.
         await adminActualizarNegocio(token, editandoId, { ...nuevo, palabrasClave });
       } else {
         await adminCrearNegocio(token, { ...nuevo, palabrasClave });
@@ -315,12 +334,35 @@ export default function AdminDashboardPage() {
               onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })}
               required
             />
-            <input
-              placeholder="Categoría"
-              value={nuevo.categoria}
-              onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })}
-              required
-            />
+
+            {/* Categoría: select en vez de input libre, mismo endpoint
+                /api/categorias que usa RegisterPage.tsx. Así lo que carga
+                el admin siempre coincide con CATEGORIAS_ESTANDAR del
+                backend, sin depender de que tipee bien. */}
+            <div className={categoriasError ? "cc-select cc-select--error" : "cc-select"}>
+              <select
+                value={nuevo.categoria}
+                onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })}
+                required
+                disabled={categorias.length === 0}
+                className="cc-select__control"
+              >
+                <option value="" disabled>
+                  {categoriasError
+                    ? "No se pudieron cargar las categorías"
+                    : categorias.length === 0
+                    ? "Cargando categorías…"
+                    : "Elegí una categoría…"}
+                </option>
+                {categorias.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <FiChevronDown className="cc-select__icon" size={18} aria-hidden="true" />
+            </div>
+
             <input
               placeholder="Imagen (URL)"
               value={nuevo.imagen}
