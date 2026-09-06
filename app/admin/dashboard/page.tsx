@@ -15,6 +15,7 @@ import {
   adminGetDiccionario,
   adminCrearCategoriaDiccionario,
   adminAgregarPalabrasClave,
+  adminEliminarEntradaDiccionario,
   isApiError,
 } from "../../lib/api";
 import { getToken, isAdmin, clearSession } from "../../lib/auth";
@@ -28,6 +29,7 @@ type EntradaDiccionario = {
   clave: string;
   categoria: string;
   palabras: string[];
+  tienePalabrasPropias: boolean;
 };
 
 const NEGOCIO_VACIO: NegocioInput = {
@@ -60,7 +62,7 @@ export default function AdminDashboardPage() {
   const [categorias, setCategorias] = useState<string[]>([]);
   const [categoriasError, setCategoriasError] = useState(false);
 
-  // NUEVO: gestión del diccionario (categorías + palabras clave) desde el admin.
+  // Gestión del diccionario (categorías + palabras clave) desde el admin.
   const [diccionario, setDiccionario] = useState<EntradaDiccionario[]>([]);
   const [diccionarioCargado, setDiccionarioCargado] = useState(false);
   const [nuevaCategoria, setNuevaCategoria] = useState("");
@@ -68,6 +70,7 @@ export default function AdminDashboardPage() {
   const [guardandoCategoria, setGuardandoCategoria] = useState(false);
   const [palabrasPorClave, setPalabrasPorClave] = useState<Record<string, string>>({});
   const [guardandoPalabrasClave, setGuardandoPalabrasClave] = useState<string | null>(null);
+  const [eliminandoClave, setEliminandoClave] = useState<string | null>(null);
 
   const cargarCategorias = useCallback(() => {
     fetch(`${API_URL}/api/categorias`)
@@ -164,26 +167,43 @@ export default function AdminDashboardPage() {
     }
   }
 
-  async function agregarPalabrasAEntrada(clave: string): Promise<void> {
+  async function agregarPalabrasAEntrada(entrada: EntradaDiccionario): Promise<void> {
     const token = getToken();
     if (!token) return;
 
-    const texto = palabrasPorClave[clave] || "";
+    const texto = palabrasPorClave[entrada.clave] || "";
     const palabras = texto
       .split(",")
       .map((p) => p.trim())
       .filter(Boolean);
     if (palabras.length === 0) return;
 
-    setGuardandoPalabrasClave(clave);
+    setGuardandoPalabrasClave(entrada.clave);
     try {
-      await adminAgregarPalabrasClave(token, clave, palabras);
-      setPalabrasPorClave((actual) => ({ ...actual, [clave]: "" }));
+      await adminAgregarPalabrasClave(token, entrada.clave, palabras, entrada.categoria);
+      setPalabrasPorClave((actual) => ({ ...actual, [entrada.clave]: "" }));
       await cargarDiccionario();
     } catch (err) {
       setError(isApiError(err) ? err.message : "No pudimos agregar las palabras clave.");
     } finally {
       setGuardandoPalabrasClave(null);
+    }
+  }
+
+  async function eliminarEntradaDiccionario(clave: string): Promise<void> {
+    const token = getToken();
+    if (!token) return;
+    if (!window.confirm("¿Seguro que querés eliminar esta entrada del diccionario?")) return;
+
+    setEliminandoClave(clave);
+    try {
+      await adminEliminarEntradaDiccionario(token, clave);
+      await cargarDiccionario();
+      cargarCategorias();
+    } catch (err) {
+      setError(isApiError(err) ? err.message : "No pudimos eliminar la entrada.");
+    } finally {
+      setEliminandoClave(null);
     }
   }
 
@@ -459,10 +479,20 @@ export default function AdminDashboardPage() {
                       type="button"
                       className="cc-btn cc-btn--ghost"
                       disabled={guardandoPalabrasClave === entrada.clave}
-                      onClick={() => void agregarPalabrasAEntrada(entrada.clave)}
+                      onClick={() => void agregarPalabrasAEntrada(entrada)}
                     >
                       {guardandoPalabrasClave === entrada.clave ? "Guardando…" : "Agregar"}
                     </button>
+                    {entrada.tienePalabrasPropias && (
+                      <button
+                        type="button"
+                        className="cc-btn cc-btn--eliminar"
+                        disabled={eliminandoClave === entrada.clave}
+                        onClick={() => void eliminarEntradaDiccionario(entrada.clave)}
+                      >
+                        {eliminandoClave === entrada.clave ? "Eliminando…" : "Eliminar"}
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}
