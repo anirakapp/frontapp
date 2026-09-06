@@ -56,7 +56,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
         </div>
 
         <nav className="cc-header__nav cc-header__nav--desktop" aria-label="Navegación principal">
-          <a href="#como-funciona">Cómo funciona</a>
+          <a href="/">Home</a>
           <a href="#menus">Menús</a>
           <a href="#negocios">Ofertas cerca</a>
           <span className="cc-header__nav-divider" aria-hidden="true" />
