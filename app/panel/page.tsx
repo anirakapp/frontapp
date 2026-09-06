@@ -183,9 +183,6 @@ export default function PanelPage(): ReactElement {
   const [error, setError] = useState<string | null>(null);
 
   // --- Perfil: nombre + teléfono + avatar, todo en un solo form ---------
-  // Coincide con lo que acepta PATCH /auth/me en authController.actualizarPerfil
-  // (nombre, telefono, avatarUrl). El endpoint viejo "/auth/avatar" no existe
-  // en authRoutes.js, por eso se unificó acá.
   const [formPerfil, setFormPerfil] = useState<PerfilFormData>({
     nombre: "",
     telefono: "",
@@ -194,15 +191,11 @@ export default function PanelPage(): ReactElement {
   const [guardandoPerfil, setGuardandoPerfil] = useState(false);
   const [perfilMensaje, setPerfilMensaje] = useState<string | null>(null);
 
+  // --- Edición de negocio propio -----------------------------------------
   const [negocioEnEdicion, setNegocioEnEdicion] = useState<string | null>(null);
   const [formNegocio, setFormNegocio] = useState<NegocioFormData>(NEGOCIO_FORM_VACIO);
   const [guardandoNegocio, setGuardandoNegocio] = useState(false);
   const [negocioMensaje, setNegocioMensaje] = useState<string | null>(null);
-
-  const [creandoNegocio, setCreandoNegocio] = useState(false);
-  const [formNuevoNegocio, setFormNuevoNegocio] = useState<NegocioFormData>(NEGOCIO_FORM_VACIO);
-  const [guardandoCreacion, setGuardandoCreacion] = useState(false);
-  const [creacionMensaje, setCreacionMensaje] = useState<string | null>(null);
 
   const [dandoBaja, setDandoBaja] = useState<string | null>(null);
 
@@ -226,7 +219,7 @@ export default function PanelPage(): ReactElement {
           avatarUrl: meData.user.avatarUrl || "",
         });
 
-        const negociosData = await apiFetch("/negocios/propios");
+        const negociosData: NegocioPropio[] = await apiFetch("/negocios/propios");
         setNegocios(negociosData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "No se pudo cargar el panel");
@@ -255,8 +248,6 @@ export default function PanelPage(): ReactElement {
     setGuardandoPerfil(true);
     setPerfilMensaje(null);
     try {
-      // PATCH /auth/me (authRoutes.js) -> authController.actualizarPerfil,
-      // que ya acepta nombre, telefono y avatarUrl en un solo request.
       const data = await apiFetch("/auth/me", {
         method: "PATCH",
         body: JSON.stringify({
@@ -278,40 +269,15 @@ export default function PanelPage(): ReactElement {
     }
   }
 
-  // --- Crear negocio -------------------------------------------------
-
-  function abrirCreacion(): void {
-    setCreandoNegocio(true);
-    setFormNuevoNegocio(NEGOCIO_FORM_VACIO);
-    setCreacionMensaje(null);
+  // --- Ir a registrar negocio (cuando el usuario todavía no tiene uno) ---
+  // Ya no hay formulario de alta inline en el panel: se reusa la página
+  // /registro (RegisterPage.tsx), que ya tiene todo el flujo de registro
+  // de negocio con el select de categorías, ubicación, etc.
+  function irARegistrarNegocio(): void {
+    router.push("/registro");
   }
 
-  function cancelarCreacion(): void {
-    setCreandoNegocio(false);
-    setFormNuevoNegocio(NEGOCIO_FORM_VACIO);
-  }
-
-  async function handleCrearNegocio(e: FormEvent): Promise<void> {
-    e.preventDefault();
-    setGuardandoCreacion(true);
-    setCreacionMensaje(null);
-    try {
-      // POST /negocios/registro (negociosRoutes.js, requireAuth) -> existe.
-      const nuevo = await apiFetch("/negocios/registro", {
-        method: "POST",
-        body: JSON.stringify(formNuevoNegocio),
-      });
-      setNegocios((prev) => [...prev, nuevo]);
-      setCreandoNegocio(false);
-      setFormNuevoNegocio(NEGOCIO_FORM_VACIO);
-    } catch (err) {
-      setCreacionMensaje(err instanceof Error ? err.message : "No se pudo registrar el negocio");
-    } finally {
-      setGuardandoCreacion(false);
-    }
-  }
-
-  // --- Editar negocio --------------------------------------------------
+  // --- Editar negocio propio --------------------------------------------
 
   function empezarEdicion(negocio: NegocioPropio): void {
     setNegocioEnEdicion(negocio.id);
@@ -340,13 +306,8 @@ export default function PanelPage(): ReactElement {
     setGuardandoNegocio(true);
     setNegocioMensaje(null);
     try {
-      // TODO (backend): PUT /negocios/propios/:id NO existe todavía en
-      // negociosRoutes.js — solo hay PUT /negocios/:id con requireAdmin.
-      // Hay que agregar algo como:
-      //   router.put("/propios/:id", requireAuth, negociosController.actualizarPropio);
-      // que en el controller verifique que negocio.ownerId === req.user.id
-      // antes de aplicar los cambios (si no, cualquier dueño podría editar
-      // el negocio de otro con solo cambiar el id en la URL).
+      // PUT /negocios/propios/:id (negociosRoutes.js, requireAuth) ->
+      // negociosController.propioActualizar, que ya valida ownerId.
       const actualizado = await apiFetch(`/negocios/propios/${id}`, {
         method: "PUT",
         body: JSON.stringify(formNegocio),
@@ -371,9 +332,8 @@ export default function PanelPage(): ReactElement {
 
     setDandoBaja(id);
     try {
-      // TODO (backend): mismo caso que arriba. DELETE /negocios/propios/:id
-      // no existe todavía — solo DELETE /negocios/:id con requireAdmin.
-      // Hace falta una ruta análoga protegida por dueño, no por admin.
+      // DELETE /negocios/propios/:id -> negociosController.propioEliminar,
+      // ya valida ownerId antes de borrar.
       await apiFetch(`/negocios/propios/${id}`, { method: "DELETE" });
       setNegocios((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
@@ -461,40 +421,30 @@ export default function PanelPage(): ReactElement {
 
       <section className="cc-panel__card">
         <div className="cc-panel__card-header">
-          <h2>Mis negocios</h2>
-          {!creandoNegocio && (
-            <button type="button" className="cc-panel__boton" onClick={abrirCreacion}>
+          <h2>Mi negocio</h2>
+
+          {/* Sin negocio: el botón lleva a /registro en vez de abrir un
+              formulario inline acá. Con negocio: no hace falta este botón,
+              ya se puede editar directo desde la tarjeta de abajo. */}
+          {negocios.length === 0 && (
+            <button type="button" className="cc-panel__boton" onClick={irARegistrarNegocio}>
               + Registrar negocio
             </button>
           )}
         </div>
 
-        {creandoNegocio && (
-          <form className="cc-panel__form" onSubmit={handleCrearNegocio}>
-            <CamposNegocio
-              valores={formNuevoNegocio}
-              onCambiar={(campo, valor) =>
-                setFormNuevoNegocio((prev) => ({ ...prev, [campo]: valor }))
-              }
-            />
-            {creacionMensaje && <p className="cc-panel__mensaje">{creacionMensaje}</p>}
-            <div className="cc-panel__acciones">
-              <button type="submit" className="cc-panel__boton" disabled={guardandoCreacion}>
-                {guardandoCreacion ? "Registrando…" : "Registrar"}
-              </button>
-              <button
-                type="button"
-                className="cc-panel__boton cc-panel__boton--secundario"
-                onClick={cancelarCreacion}
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
-
-        {negocios.length === 0 && !creandoNegocio && (
-          <p>Todavía no tenés ningún negocio registrado.</p>
+        {negocios.length === 0 && (
+          <p>
+            Todavía no tenés ningún negocio registrado.{" "}
+            <button
+              type="button"
+              className="cc-panel__link"
+              onClick={irARegistrarNegocio}
+            >
+              Registrá el tuyo
+            </button>
+            .
+          </p>
         )}
 
         {negocioMensaje && <p className="cc-panel__mensaje">{negocioMensaje}</p>}
