@@ -56,12 +56,15 @@
 }
 
 /* ---------- Nav ---------- */
-.cc-header__nav {
-  display: none; /* en mobile se oculta: ver .cc-header__ciudad y CTAs en su lugar */
+.cl.cc-header__nav {
+  display: none;
   align-items: center;
   gap: 20px;
   font-size: 14px;
   flex-wrap: wrap;
+  border: 3px solid #22c55e;
+  border-radius: 10px;
+  padding: 10px 15px;
 }
 
 .cc-header__nav a {
