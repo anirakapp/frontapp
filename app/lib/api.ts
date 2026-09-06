@@ -280,6 +280,7 @@ export interface EntradaDiccionario {
   clave: string;
   categoria: string;
   palabras: string[];
+  tienePalabrasPropias: boolean;
 }
 
 export interface DiccionarioResponse {
@@ -308,16 +309,35 @@ export async function adminCrearCategoriaDiccionario(
   return parseJsonOrThrow<EntradaDiccionario>(res);
 }
 
-/** POST /api/admin/diccionario/:clave/palabras — suma palabras clave a una entrada existente (estática o propia). */
+/**
+ * POST /api/admin/diccionario/:clave/palabras — suma palabras clave a una
+ * entrada existente (estática o propia). `categoriaFallback` es la categoría
+ * de esa entrada tal como la ves en el listado; el backend la usa para crear
+ * la fila en Mongo si la clave es de una categoría estática que todavía no
+ * tiene palabras propias cargadas.
+ */
 export async function adminAgregarPalabrasClave(
   token: string,
   clave: string,
-  palabras: string[]
+  palabras: string[],
+  categoriaFallback: string
 ): Promise<EntradaDiccionario> {
   const res = await fetch(`${API_URL}/api/admin/diccionario/${encodeURIComponent(clave)}/palabras`, {
     method: "POST",
     headers: authHeaders(token),
-    body: JSON.stringify({ palabras }),
+    body: JSON.stringify({ palabras, categoriaFallback }),
+  });
+  return parseJsonOrThrow<EntradaDiccionario>(res);
+}
+
+/** DELETE /api/admin/diccionario/:clave — borra la fila propia cargada por el admin (no afecta el diccionario base). */
+export async function adminEliminarEntradaDiccionario(
+  token: string,
+  clave: string
+): Promise<EntradaDiccionario> {
+  const res = await fetch(`${API_URL}/api/admin/diccionario/${encodeURIComponent(clave)}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
   });
   return parseJsonOrThrow<EntradaDiccionario>(res);
 }
