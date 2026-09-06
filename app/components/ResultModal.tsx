@@ -307,6 +307,11 @@ export default function ResultModal({
                           <span className="cc-chip cc-chip--distancia">
                             {negocio.distanciaKm.toFixed(1)} km
                           </span>
+
+                          {/* Likes: siempre visible, incluso en 0 */}
+                          <span className="cc-chip cc-chip--likes">
+                            ❤️ {negocio.likes ?? 0}
+                          </span>
                         </div>
                       </div>
 
