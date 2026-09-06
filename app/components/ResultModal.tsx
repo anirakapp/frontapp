@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useMemo, type ReactElement } from "react";
+import { useRef, useState, useMemo, useEffect, type ReactElement } from "react";
+import { FiChevronDown } from "react-icons/fi";
 import type { CalculoResponse, Negocio } from "../lib/types";
 import type { useNegociosCercanos } from "../hooks/useNegociosCercanos";
 import { categoriasRelevantes } from "../lib/categoriasNegocio";
@@ -37,10 +38,36 @@ export default function ResultModal({
   negociosCercanosState,
 }: ResultModalProps): ReactElement {
   const captureRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const negociosRef = useRef<HTMLElement>(null);
 
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  // Indicador de "hay más para ver acá abajo": se oculta solo una vez que
+  // el usuario ya scrolleó cerca del final del panel.
+  const [mostrarIndicadorScroll, setMostrarIndicadorScroll] = useState(true);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    function handleScroll() {
+      if (!panel) return;
+      const faltaPoco = panel.scrollHeight - panel.scrollTop - panel.clientHeight < 24;
+      setMostrarIndicadorScroll(!faltaPoco);
+    }
+
+    // Chequeo inicial: si el contenido ya entra sin scroll, no mostramos nada.
+    handleScroll();
+    panel.addEventListener("scroll", handleScroll);
+    return () => panel.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  function irANegocios(): void {
+    negociosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   const {
     negocios,
@@ -196,7 +223,7 @@ export default function ResultModal({
     >
       <div className="cc-modal__backdrop" onClick={onClose} />
 
-      <div className="cc-modal__panel">
+      <div className="cc-modal__panel" ref={panelRef}>
         <button
           type="button"
           className="cc-modal__close"
@@ -250,7 +277,7 @@ export default function ResultModal({
         {/* ==================================================
             ESTO NO SE CAPTURA — negocios sugeridos según lo elegido
             ================================================== */}
-        <section className="cc-modal__negocios" aria-labelledby="negocios-heading">
+        <section className="cc-modal__negocios" aria-labelledby="negocios-heading" ref={negociosRef}>
           <h3 id="negocios-heading">Negocios sugeridos cerca tuyo</h3>
 
           {cargandoNegocios && <p>Buscando negocios cerca…</p>}
@@ -373,6 +400,20 @@ export default function ResultModal({
           <p className="cc-error" role="alert">
             {downloadError}
           </p>
+        )}
+
+        {/* Indicador flotante: avisa que hay más contenido (los negocios)
+            más abajo, y al tocarlo baja directo ahí. Se oculta solo cuando
+            el usuario ya scrolleó cerca del final del panel. */}
+        {mostrarIndicadorScroll && (
+          <button
+            type="button"
+            className="cc-modal__scroll-hint"
+            onClick={irANegocios}
+            aria-label="Ver negocios cerca tuyo"
+          >
+            <FiChevronDown size={20} />
+          </button>
         )}
       </div>
     </div>
