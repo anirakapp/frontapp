@@ -1,7 +1,3 @@
-// lib/api.ts
-// Única capa que conoce la URL del backend. Todo el cálculo real
-// (cantidades de comida/bebida) y el listado de negocios vive en el backend
-// (index.js -> routes -> controllers). Acá SOLO hacemos fetch y tipamos la respuesta.
 import type {
   CalculoRequest,
   CalculoResponse,
@@ -276,6 +272,54 @@ export async function adminDesactivarNegocio(token: string, id: string): Promise
     headers: authHeaders(token),
   });
   return parseJsonOrThrow<Negocio>(res);
+}
+
+// ---------------- Admin: diccionario (categorías / palabras clave) ----------------
+
+export interface EntradaDiccionario {
+  clave: string;
+  categoria: string;
+  palabras: string[];
+}
+
+export interface DiccionarioResponse {
+  entradas: EntradaDiccionario[];
+}
+
+/** GET /api/admin/diccionario — todas las entradas (estáticas + cargadas por el admin), ya mezcladas. */
+export async function adminGetDiccionario(token: string): Promise<DiccionarioResponse> {
+  const res = await fetch(`${API_URL}/api/admin/diccionario`, {
+    headers: authHeaders(token),
+    cache: "no-store",
+  });
+  return parseJsonOrThrow<DiccionarioResponse>(res);
+}
+
+/** POST /api/admin/diccionario/categoria — crea una categoría nueva con sus palabras clave iniciales. */
+export async function adminCrearCategoriaDiccionario(
+  token: string,
+  data: { categoria: string; palabras: string[] }
+): Promise<EntradaDiccionario> {
+  const res = await fetch(`${API_URL}/api/admin/diccionario/categoria`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  });
+  return parseJsonOrThrow<EntradaDiccionario>(res);
+}
+
+/** POST /api/admin/diccionario/:clave/palabras — suma palabras clave a una entrada existente (estática o propia). */
+export async function adminAgregarPalabrasClave(
+  token: string,
+  clave: string,
+  palabras: string[]
+): Promise<EntradaDiccionario> {
+  const res = await fetch(`${API_URL}/api/admin/diccionario/${encodeURIComponent(clave)}/palabras`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ palabras }),
+  });
+  return parseJsonOrThrow<EntradaDiccionario>(res);
 }
 
 // ---------------- Buscador inteligente ----------------
