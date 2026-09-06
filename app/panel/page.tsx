@@ -433,20 +433,6 @@ export default function PanelPage(): ReactElement {
           )}
         </div>
 
-        {negocios.length === 0 && (
-          <p>
-            Todavía no tenés ningún negocio registrado.{" "}
-            <button
-              type="button"
-              className="cc-panel__link"
-              onClick={irARegistrarNegocio}
-            >
-              Registrá el tuyo
-            </button>
-            .
-          </p>
-        )}
-
         {negocioMensaje && <p className="cc-panel__mensaje">{negocioMensaje}</p>}
 
         {negocios.map((negocio) => (
