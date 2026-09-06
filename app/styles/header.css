@@ -56,15 +56,29 @@
 }
 
 /* ---------- Nav ---------- */
-.cl.cc-header__nav {
+/* Antes decía ".cl.cc-header__nav" — ".cl" era un typo que no matcheaba
+   ninguna clase del JSX (que usa "cc-header__nav cc-header__nav--desktop"),
+   así que este bloque entero nunca se aplicaba. También tenía un borde
+   verde de 3px que se veía a debug leftover en vez de un borde de diseño. */
+.cc-header__nav,
+.cc-header__nav--desktop {
   display: none;
   align-items: center;
   gap: 20px;
   font-size: 14px;
   flex-wrap: wrap;
-  border: 3px solid #22c55e;
-  border-radius: 10px;
-  padding: 10px 15px;
+  border: 1px solid var(--cc-border);
+  border-radius: 999px;
+  padding: 8px 18px;
+  background: var(--cc-white);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cc-header__nav:hover,
+.cc-header__nav--desktop:hover {
+  border-color: var(--cc-green);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 .cc-header__nav a {
@@ -243,7 +257,8 @@
     height: 60px;
   }
 
-  .cc-header__nav {
+  .cc-header__nav,
+  .cc-header__nav--desktop {
     display: flex;
   }
 
@@ -260,6 +275,7 @@
     margin-top: 12px;
   }
 }
+
 /* ---------- Nav mobile desplegable ---------- */
 .cc-header__nav--mobile {
   display: flex;
