@@ -321,29 +321,37 @@
   min-height: auto;
 }
 
-/* Botón flotante "hay más abajo": flota sobre el contenido, arriba de la
-   barra de acciones sticky, con una animación sutil de rebote para que
-   se note que hay algo para ver más abajo. align-self: flex-end lo pega
-   a la derecha aprovechando que .cc-modal__panel ya es flex-column. */
+/* Botón flotante "hay más abajo": solo en pantallas anchas (en mobile el
+   modal ya se ve completo sin necesidad de esto). z-index mayor al de
+   .cc-modal__actions para que no quede tapado por esa barra, y un bottom
+   más alto para despegarlo bien por encima de los botones de abajo. */
 .cc-modal__scroll-hint {
-  position: sticky;
-  align-self: flex-end;
-  bottom: 96px;
-  right: 16px;
-  margin-right: 16px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: #1f8a4c;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(31, 138, 76, 0.4);
-  cursor: pointer;
-  z-index: 3;
-  animation: cc-scroll-hint-bounce 1.4s ease-in-out infinite;
+  display: none;
+}
+
+@media (min-width: 700px) {
+  .cc-modal__scroll-hint {
+    position: sticky;
+    align-self: flex-end;
+    /* bottom se aplica por JS (inline style), calculado a partir de la
+       altura real medida de .cc-modal__actions, para que nunca pueda
+       quedar encima de Descargar/Compartir/Volver a editar. */
+    right: 16px;
+    margin-right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #1f8a4c;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(31, 138, 76, 0.4);
+    cursor: pointer;
+    z-index: 6;
+    animation: cc-scroll-hint-bounce 1.4s ease-in-out infinite;
+  }
 }
 
 @keyframes cc-scroll-hint-bounce {
