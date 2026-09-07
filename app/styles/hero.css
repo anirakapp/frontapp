@@ -112,10 +112,7 @@
 }
 
 /* ---------- Imagen ---------- */
-/* aspect-ratio fijo (coincide con el width/height 520x220 que le pasás al
-   componente next/image) para reservar el espacio antes de que cargue y
-   evitar el salto de layout. En mobile se limita el alto con max-height
-   para que no ocupe media pantalla en celulares angostos y altos. */
+
 .cc-hero__image {
   width: 100%;
   max-width: 360px;
@@ -179,5 +176,52 @@
 
   .cc-hero__rotator-item {
     font-size: clamp(18px, 1.8vw, 22px);
+  }
+}
+/* ============================================================
+   Mobile: la imagen pasa a ser fondo difuminado detrás del texto
+   (solo aplica hasta 859px, así el desktop queda intacto)
+   ============================================================ */
+@media (max-width: 859px) {
+  .cc-hero {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Capa blanca semitransparente para que el texto se lea bien
+     encima de la foto difuminada */
+  .cc-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.78);
+    z-index: 1;
+  }
+
+  .cc-hero__copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cc-hero__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: auto;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 0.35;
+    filter: blur(6px) saturate(1.05);
+    z-index: 0;
+  }
+
+  .cc-hero__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
