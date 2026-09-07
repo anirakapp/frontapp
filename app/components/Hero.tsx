@@ -5,12 +5,23 @@ export default function Hero(): ReactElement {
   return (
     <section className="cc-hero">
       <div className="cc-hero__copy">
-        <h1>
+        <h1 className="cc-hero__title">
           Calculá fácil
           <br />
           para tu reunión
         </h1>
-        <p>Te ayudamos a saber cuánto comprar y dónde conseguirlo cerca tuyo.</p>
+
+        <p className="cc-hero__lead">
+          Te ayudamos a saber{" "}
+          <span className="cc-hero__rotator" aria-live="polite">
+            <span className="cc-hero__rotator-item cc-hero__rotator-item--a">
+              cuánto comprar.
+            </span>
+            <span className="cc-hero__rotator-item cc-hero__rotator-item--b">
+              dónde conseguirlo cerca tuyo.
+            </span>
+          </span>
+        </p>
       </div>
 
       <div className="cc-hero__image" aria-hidden="true">
