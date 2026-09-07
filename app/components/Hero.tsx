@@ -16,7 +16,7 @@ export default function Hero(): ReactElement {
           Te ayudamos a saber{" "}
           <span className="cc-hero__rotator" aria-live="polite">
             <span className="cc-hero__rotator-item cc-hero__rotator-item--a">
-              cuánto comprar.
+             cuánto necesitás comprar.
             </span>
             <span className="cc-hero__rotator-item cc-hero__rotator-item--b">
               dónde conseguirlo cerca tuyo.
