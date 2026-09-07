@@ -178,7 +178,7 @@
     margin: 0;
     border-radius: 0;
     box-shadow: none;
-    z-index: 1;
+    z-index: 0;
   }
 
   .cc-hero__image img {
@@ -187,7 +187,6 @@
     object-fit: cover;
     filter: blur(6px) saturate(1.05);
     opacity: 0.8;
-    z-index: 1;
   }
 
   .cc-hero__image::after {
@@ -195,7 +194,5 @@
     position: absolute;
     inset: 0;
     background: rgba(255, 255, 255, 0.5);
-    z-index: 1;
-    
   }
 }
