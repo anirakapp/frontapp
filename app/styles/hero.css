@@ -59,13 +59,10 @@
   grid-area: 1 / 1;
   display: inline-flex;
   align-items: center;
-  background: var(--cc-orange);
-  color: #ffffff;
+  color: var(--cc-orange);
   font-weight: 700;
-  font-size: clamp(15px, 3.6vw, 17px);
+  font-size: clamp(17px, 4vw, 20px);
   line-height: 1.4;
-  padding: 3px 10px;
-  border-radius: 6px;
   animation: cc-hero-fade-a 9s ease-in-out infinite;
 }
 
@@ -165,8 +162,6 @@
   }
 
   .cc-hero__rotator-item {
-    font-size: clamp(16px, 1.6vw, 18px);
-    padding: 4px 12px;
-    border-radius: 6px;
+    font-size: clamp(18px, 1.8vw, 22px);
   }
 }
