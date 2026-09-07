@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import Image from "next/image";
+import "../styles/hero.css";
 
 export default function Hero(): ReactElement {
   return (
