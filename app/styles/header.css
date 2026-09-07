@@ -134,6 +134,22 @@
   background: var(--cc-green-dark);
 }
 
+/* "Registrate" (usuario) usa la misma clase --cta que "Registrá tu negocio"
+   (href="/registro"), así que ambos quedaban idénticos y competían entre sí
+   a simple vista. Se distingue acá por href, sin tocar el JSX: se deja
+   "Registrá tu negocio" como el CTA lleno (acción de negocio, prioridad
+   visual), y "Registrate" pasa a outline, agrupándose visualmente junto a
+   "Ingresar" como el par de acciones de cuenta de usuario. */
+.cc-header__nav-link--cta[href="/register"] {
+  background: transparent;
+  border: 1px solid var(--cc-green);
+  color: var(--cc-green-dark);
+}
+
+.cc-header__nav-link--cta[href="/register"]:hover {
+  background: var(--cc-green-light);
+}
+
 .cc-header__nav-link--login {
   border: 1px solid var(--cc-green);
   color: var(--cc-green-dark);
