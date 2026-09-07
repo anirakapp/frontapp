@@ -50,15 +50,23 @@
    así el cross-fade no mueve el resto del texto ni genera layout shift. */
 .cc-hero__rotator {
   display: inline-grid;
-  vertical-align: top;
+  vertical-align: middle;
   text-align: left;
+  margin-left: 4px;
 }
 
 .cc-hero__rotator-item {
   grid-area: 1 / 1;
-  color: var(--cc-orange);
-  font-weight: 700;
-  animation: cc-hero-fade-a 7s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  background: var(--cc-orange);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: clamp(17px, 4.2vw, 22px);
+  line-height: 1.25;
+  padding: 8px 16px;
+  border-radius: 10px;
+  animation: cc-hero-fade-a 9s ease-in-out infinite;
 }
 
 .cc-hero__rotator-item--b {
@@ -154,5 +162,11 @@
 
   .cc-hero__title {
     font-size: clamp(36px, 3.4vw, 44px);
+  }
+
+  .cc-hero__rotator-item {
+    font-size: clamp(20px, 2vw, 26px);
+    padding: 10px 20px;
+    border-radius: 12px;
   }
 }
