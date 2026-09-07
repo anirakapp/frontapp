@@ -1,10 +1,8 @@
 /*styles/hero.css*/
-
 :root {
   --cc-orange: #f97316;
   --cc-orange-dark: #ea580c;
 }
-
 /* ---------- Contenedor general ---------- */
 .cc-hero {
   display: flex;
@@ -14,11 +12,9 @@
   padding: 20px 16px 8px;
   box-sizing: border-box;
 }
-
 .cc-hero * {
   box-sizing: border-box;
 }
-
 /* ---------- Copy (título + texto) ---------- */
 .cc-hero__copy {
   display: flex;
@@ -27,7 +23,6 @@
   text-align: center;
   max-width: 480px;
 }
-
 .cc-hero__title {
   margin: 0;
   color: #111111;
@@ -36,25 +31,19 @@
   letter-spacing: -0.01em;
   font-size: clamp(28px, 6vw, 40px);
 }
-
 .cc-hero__lead {
   margin: 0;
   color: #111111;
   font-size: clamp(15px, 3.6vw, 17px);
   line-height: 1.5;
 }
-
 /* ---------- Rotador de frases ---------- */
-/* display:inline-grid + grid-area 1/1 en los dos items: los apila uno sobre
-   el otro y el contenedor se dimensiona solo con el más ancho de los dos,
-   así el cross-fade no mueve el resto del texto ni genera layout shift. */
 .cc-hero__rotator {
   display: inline-grid;
   vertical-align: middle;
   text-align: left;
   margin-left: 4px;
 }
-
 .cc-hero__rotator-item {
   grid-area: 1 / 1;
   display: inline-flex;
@@ -65,11 +54,9 @@
   line-height: 1.4;
   animation: cc-hero-fade-a 9s ease-in-out infinite;
 }
-
 .cc-hero__rotator-item--b {
   animation-name: cc-hero-fade-b;
 }
-
 @keyframes cc-hero-fade-a {
   0%,
   40% {
@@ -83,7 +70,6 @@
     opacity: 1;
   }
 }
-
 @keyframes cc-hero-fade-b {
   0%,
   40% {
@@ -97,8 +83,6 @@
     opacity: 0;
   }
 }
-
-/* Respeta a quien prefiere menos movimiento: se queda fija en la primera frase. */
 @media (prefers-reduced-motion: reduce) {
   .cc-hero__rotator-item {
     animation: none;
@@ -110,9 +94,7 @@
     opacity: 0;
   }
 }
-
-/* ---------- Imagen ---------- */
-
+/* ---------- Imagen (desktop / base) ---------- */
 .cc-hero__image {
   width: 100%;
   max-width: 360px;
@@ -122,38 +104,31 @@
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
 }
-
 .cc-hero__image img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 /* ============================================================
-   Responsive — mobile-first, siguiendo el mismo criterio que
-   header.css: se agranda/reordena a partir de acá.
+   Responsive — mobile-first
    ============================================================ */
-
 @media (min-width: 480px) {
   .cc-hero__image {
     max-width: 420px;
     max-height: 240px;
   }
 }
-
 @media (min-width: 640px) {
   .cc-hero {
     padding: 36px 24px 16px;
   }
-
   .cc-hero__image {
     max-width: 480px;
     max-height: none;
     border-radius: 16px;
   }
 }
-
 /* Desktop: texto a la izquierda, imagen a la derecha */
 @media (min-width: 860px) {
   .cc-hero {
@@ -164,38 +139,27 @@
     padding: 48px 32px 24px;
     text-align: left;
   }
-
   .cc-hero__copy {
     text-align: left;
     max-width: 460px;
   }
-
   .cc-hero__title {
     font-size: clamp(36px, 3.4vw, 44px);
   }
-
   .cc-hero__rotator-item {
     font-size: clamp(18px, 1.8vw, 22px);
   }
 }
+
 /* ============================================================
    Mobile: la imagen pasa a ser fondo difuminado detrás del texto
-   (solo aplica hasta 859px, así el desktop queda intacto)
+   (bloque al final del archivo para ganar la cascada en ≤859px;
+   !important en las props que pisan reglas de arriba)
    ============================================================ */
 @media (max-width: 859px) {
   .cc-hero {
     position: relative;
     overflow: hidden;
-  }
-
-  /* Capa blanca semitransparente para que el texto se lea bien
-     encima de la foto difuminada */
-  .cc-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.78);
-    z-index: 1;
   }
 
   .cc-hero__copy {
@@ -204,18 +168,16 @@
   }
 
   .cc-hero__image {
-    position: absolute;
+    position: absolute !important;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    aspect-ratio: auto;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
     margin: 0;
     border-radius: 0;
     box-shadow: none;
-    opacity:0.6;
-    filter: blur(6px) saturate(1.05);
     z-index: 0;
   }
 
@@ -223,5 +185,14 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: blur(6px) saturate(1.05);
+    opacity: 0.8;
+  }
+
+  .cc-hero__image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.5);
   }
 }
