@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
+import { FiChevronDown } from "react-icons/fi";
 import { getToken, saveSession, isAdmin } from "../lib/auth";
 import Header from "../components/Header";
 import type { Negocio } from "../lib/types";
@@ -37,8 +38,8 @@ interface NegocioPropio {
   isBlocked: boolean;
 }
 
-type NegocioFormData = Partial<
-  Pick<
+type NegocioFormData = Partial
+  Pick
     NegocioPropio,
     | "nombre"
     | "categoria"
@@ -92,9 +93,13 @@ async function apiFetch(path: string, options: RequestInit = {}) {
 function CamposNegocio({
   valores,
   onCambiar,
+  categorias,
+  categoriasError,
 }: {
   valores: NegocioFormData;
   onCambiar: (campo: keyof NegocioFormData, valor: string) => void;
+  categorias: string[];
+  categoriasError: boolean;
 }): ReactElement {
   return (
     <>
@@ -108,11 +113,29 @@ function CamposNegocio({
       </label>
       <label>
         Categoría
-        <input
-          value={valores.categoria || ""}
-          onChange={(e) => onCambiar("categoria", e.target.value)}
-          required
-        />
+        <div className={categoriasError ? "cc-select cc-select--error" : "cc-select"}>
+          <select
+            value={valores.categoria || ""}
+            onChange={(e) => onCambiar("categoria", e.target.value)}
+            required
+            disabled={categorias.length === 0}
+            className="cc-select__control"
+          >
+            <option value="" disabled>
+              {categoriasError
+                ? "No se pudieron cargar las categorías"
+                : categorias.length === 0
+                ? "Cargando categorías…"
+                : "Elegí una categoría…"}
+            </option>
+            {categorias.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </option>
+            ))}
+          </select>
+          <FiChevronDown className="cc-select__icon" size={18} aria-hidden="true" />
+        </div>
       </label>
       <label>
         Imagen (URL)
@@ -184,6 +207,10 @@ export default function PanelPage(): ReactElement {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // --- Categorías del diccionario (mismo endpoint público que usa admin) --
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categoriasError, setCategoriasError] = useState(false);
+
   // --- Perfil: nombre + teléfono + avatar, todo en un solo form ---------
   const [formPerfil, setFormPerfil] = useState<PerfilFormData>({
     nombre: "",
@@ -200,6 +227,21 @@ export default function PanelPage(): ReactElement {
   const [negocioMensaje, setNegocioMensaje] = useState<string | null>(null);
 
   const [dandoBaja, setDandoBaja] = useState<string | null>(null);
+
+  // GET /api/categorias es público (mismo endpoint que consume el admin
+  // dashboard): no lleva Authorization, así que no requiere permisos de admin.
+  useEffect(() => {
+    fetch(`${API_BASE}/categorias`)
+      .then((res) => {
+        if (!res.ok) throw new Error("No se pudieron cargar las categorías");
+        return res.json();
+      })
+      .then((data) => {
+        setCategorias(data.categorias || []);
+        setCategoriasError(false);
+      })
+      .catch(() => setCategoriasError(true));
+  }, []);
 
   useEffect(() => {
     if (!getToken()) {
@@ -272,9 +314,6 @@ export default function PanelPage(): ReactElement {
   }
 
   // --- Ir a registrar negocio (cuando el usuario todavía no tiene uno) ---
-  // Ya no hay formulario de alta inline en el panel: se reusa la página
-  // /registro (RegisterPage.tsx), que ya tiene todo el flujo de registro
-  // de negocio con el select de categorías, ubicación, etc.
   function irARegistrarNegocio(): void {
     router.push("/registro");
   }
@@ -308,8 +347,6 @@ export default function PanelPage(): ReactElement {
     setGuardandoNegocio(true);
     setNegocioMensaje(null);
     try {
-      // PUT /negocios/propios/:id (negociosRoutes.js, requireAuth) ->
-      // negociosController.propioActualizar, que ya valida ownerId.
       const actualizado = await apiFetch(`/negocios/propios/${id}`, {
         method: "PUT",
         body: JSON.stringify(formNegocio),
@@ -334,8 +371,6 @@ export default function PanelPage(): ReactElement {
 
     setDandoBaja(id);
     try {
-      // DELETE /negocios/propios/:id -> negociosController.propioEliminar,
-      // ya valida ownerId antes de borrar.
       await apiFetch(`/negocios/propios/${id}`, { method: "DELETE" });
       setNegocios((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
@@ -345,11 +380,6 @@ export default function PanelPage(): ReactElement {
     }
   }
 
-  // El panel no tiene su propia sección de resultados de búsqueda (eso vive
-  // en HomeView). Si alguien busca desde el Header estando en /panel, lo
-  // mandamos al home; ahí no tenemos forma de pasarle los resultados ya
-  // calculados sin agregar estado global, así que simplemente navega y
-  // el usuario puede volver a buscar en el home si hace falta.
   function handleResultadosBusqueda(_resultados: Negocio[], query: string): void {
     if (query.trim()) {
       router.push("/");
@@ -444,9 +474,6 @@ export default function PanelPage(): ReactElement {
         <div className="cc-panel__card-header">
           <h2>Mi negocio</h2>
 
-          {/* Sin negocio: el botón lleva a /registro en vez de abrir un
-              formulario inline acá. Con negocio: no hace falta este botón,
-              ya se puede editar directo desde la tarjeta de abajo. */}
           {negocios.length === 0 && (
             <button type="button" className="cc-panel__boton" onClick={irARegistrarNegocio}>
               + Registrar negocio
@@ -468,6 +495,8 @@ export default function PanelPage(): ReactElement {
                   onCambiar={(campo, valor) =>
                     setFormNegocio((prev) => ({ ...prev, [campo]: valor }))
                   }
+                  categorias={categorias}
+                  categoriasError={categoriasError}
                 />
                 <div className="cc-panel__acciones">
                   <button type="submit" className="cc-panel__boton" disabled={guardandoNegocio}>
