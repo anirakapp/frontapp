@@ -12,6 +12,12 @@ interface BusinessCardProps {
   negocio: Negocio;
 }
 
+function armarLinkWhatsapp(numero: string, nombreNegocio: string): string {
+  const numeroLimpio = numero.replace(/\D/g, "");
+  const mensaje = `Hola ${nombreNegocio}, te contacto desde la app!`;
+  return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+}
+
 export default function BusinessCard({ negocio }: BusinessCardProps): ReactElement {
   const router = useRouter();
   const [liked, setLiked] = useState(Boolean(negocio.likeadoPorMi));
@@ -74,18 +80,28 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
           <span>⭐ {negocio.rating.toFixed(1)}</span>
           <span>({negocio.reviews})</span>
           <span>📍 {formatearDistancia(negocio.distanciaKm)}</span>
-          {/* Likes: siempre visible, incluso en 0, no solo cuando empieza el conteo */}
           <span>❤️ {likes}</span>
         </p>
         <p className="cc-business__direccion">
           {negocio.direccion ? negocio.direccion : "Dirección no cargada"}
         </p>
-         <p className="cc-business__horarios">
+        <p className="cc-business__horarios">
           {negocio.horarios ? `Horario: ${negocio.horarios}` : "No cargados"}
         </p>
-        <p className="cc-business__telefono">
-          📞 {negocio.whatsapp ? negocio.whatsapp : "No proporcionado"}
-        </p>
+        {negocio.whatsapp ? (
+          
+            className="cc-business__whatsapp"
+            href={armarLinkWhatsapp(negocio.whatsapp, negocio.nombre)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="cc-business__whatsapp-icon">💬</span>
+            Escribir por WhatsApp
+          </a>
+        ) : (
+          <p className="cc-business__telefono">📞 No proporcionado</p>
+        )}
         {negocio.badge && <p className="cc-business__badge">{negocio.badge}</p>}
       </div>
     </article>
