@@ -168,17 +168,14 @@
   }
 
   .cc-hero__title {
-    color: #111111;
     text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 18px rgba(255, 255, 255, 0.7);
   }
 
   .cc-hero__lead {
-    color: #111111;
     text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.7);
   }
 
   .cc-hero__rotator-item {
-    color: var(--cc-orange-dark);
     text-shadow: 0 1px 3px rgba(255, 255, 255, 0.95), 0 0 14px rgba(255, 255, 255, 0.8);
   }
 
