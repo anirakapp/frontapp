@@ -38,8 +38,8 @@ interface NegocioPropio {
   isBlocked: boolean;
 }
 
-type NegocioFormData = Partial
-  Pick
+type NegocioFormData = Partial<
+  Pick<
     NegocioPropio,
     | "nombre"
     | "categoria"
