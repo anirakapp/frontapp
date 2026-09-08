@@ -2,6 +2,15 @@
 import { useState, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import {
+  FaWhatsapp,
+  FaClock,
+  FaMapMarkerAlt,
+  FaStar,
+  FaHeart,
+  FaRegHeart,
+  FaPhone,
+} from "react-icons/fa";
 import type { Negocio } from "../lib/types";
 import { formatearDistancia } from "../lib/format";
 import { likeBusiness, unlikeBusiness, isApiError } from "../lib/api";
@@ -70,37 +79,46 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
           disabled={procesando}
           onClick={() => void handleLike()}
         >
-          {liked ? "♥" : "♡"}
+          {liked ? <FaHeart /> : <FaRegHeart />}
         </button>
         <Image src={negocio.imagen} alt={negocio.nombre} fill sizes="260px" style={{ objectFit: "cover" }} />
       </div>
       <div className="cc-business__body">
         <h3>{negocio.nombre}</h3>
         <p className="cc-business__meta">
-          <span>⭐ {negocio.rating.toFixed(1)}</span>
+          <span>
+            <FaStar /> {negocio.rating.toFixed(1)}
+          </span>
           <span>({negocio.reviews})</span>
-          <span>📍 {formatearDistancia(negocio.distanciaKm)}</span>
-          <span>❤️ {likes}</span>
+          <span>
+            <FaMapMarkerAlt /> {formatearDistancia(negocio.distanciaKm)}
+          </span>
+          <span>
+            <FaHeart /> {likes}
+          </span>
         </p>
         <p className="cc-business__direccion">
           {negocio.direccion ? negocio.direccion : "Dirección no cargada"}
         </p>
         <p className="cc-business__horarios">
+          <FaClock />
           {negocio.horarios ? `Horario: ${negocio.horarios}` : "No cargados"}
         </p>
         {negocio.whatsapp ? (
           
-             <a className="cc-business__whatsapp"
+            className="cc-business__whatsapp"
             href={armarLinkWhatsapp(negocio.whatsapp, negocio.nombre)}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="cc-business__whatsapp-icon">💬</span>
+            <FaWhatsapp className="cc-business__whatsapp-icon" />
             Escribir por WhatsApp
           </a>
         ) : (
-          <p className="cc-business__telefono">📞 No proporcionado</p>
+          <p className="cc-business__telefono">
+            <FaPhone /> No proporcionado
+          </p>
         )}
         {negocio.badge && <p className="cc-business__badge">{negocio.badge}</p>}
       </div>
