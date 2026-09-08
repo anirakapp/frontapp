@@ -38,8 +38,8 @@ interface NegocioPropio {
   isBlocked: boolean;
 }
 
-type NegocioFormData = Partial<
-  Pick<
+type NegocioFormData = Partial
+  Pick
     NegocioPropio,
     | "nombre"
     | "categoria"
@@ -280,11 +280,13 @@ export default function PanelPage(): ReactElement {
   async function handleGuardarPerfil(e: FormEvent): Promise<void> {
     e.preventDefault();
 
+    const avatarUrlLimpia = formPerfil.avatarUrl.trim();
+
     if (!formPerfil.nombre.trim()) {
       setPerfilMensaje("El nombre no puede estar vacío.");
       return;
     }
-    if (formPerfil.avatarUrl && !/^https?:\/\/.+/i.test(formPerfil.avatarUrl)) {
+    if (avatarUrlLimpia && !/^https?:\/\/\S+$/i.test(avatarUrlLimpia)) {
       setPerfilMensaje("La URL del avatar no es válida.");
       return;
     }
@@ -297,7 +299,7 @@ export default function PanelPage(): ReactElement {
         body: JSON.stringify({
           nombre: formPerfil.nombre.trim(),
           telefono: formPerfil.telefono.trim() || null,
-          avatarUrl: formPerfil.avatarUrl.trim() || null,
+          avatarUrl: avatarUrlLimpia || null,
         }),
       });
       setUsuario(data.user);
