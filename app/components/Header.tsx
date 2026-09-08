@@ -1,3 +1,4 @@
+// components/Header.tsx
 "use client";
 
 import { useEffect, useState, type ReactElement } from "react";
@@ -42,11 +43,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
       <div className="cc-header__top">
         <div className="cc-header__brand">
           <span className="cc-header__logo" aria-hidden="true">
-            <img
-              src="/assets/hero/canasta.jpg"
-              alt=""
-              className="cc-header__logo-img"
-            />
+            <img src="/assets/hero/canasta.jpg" alt="" className="cc-header__logo-img" />
           </span>
           <span className="cc-header__title">
             ¿Cuánto
@@ -65,18 +62,10 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
 
           {logueado ? (
             <>
-              <button
-                type="button"
-                className="cc-header__nav-link cc-header__nav-link--panel"
-                onClick={irAPanel}
-              >
+              <button type="button" className="cc-header__nav-link cc-header__nav-link--panel" onClick={irAPanel}>
                 Panel
               </button>
-              <button
-                type="button"
-                className="cc-header__nav-link cc-header__nav-link--login"
-                onClick={handleLogout}
-              >
+              <button type="button" className="cc-header__nav-link cc-header__nav-link--login" onClick={handleLogout}>
                 Cerrar sesión
               </button>
             </>
@@ -93,12 +82,7 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
         </nav>
 
         <button type="button" className="cc-header__ciudad">
-          <img
-            src="/assets/hero/ubicacion.jpg"
-            alt=""
-            aria-hidden="true"
-            className="cc-header__ubicacion"
-          />
+          <img src="/assets/hero/ubicacion.jpg" alt="" aria-hidden="true" className="cc-header__ubicacion" />
           <span>{ciudad}</span>
           <span aria-hidden="true">▾</span>
         </button>
@@ -116,59 +100,32 @@ export default function Header({ ciudad, onResultados }: HeaderProps): ReactElem
       </div>
 
       {menuAbierto && (
-        <nav
-          id="cc-header-mobile-nav"
-          className="cc-header__nav cc-header__nav--mobile"
-          aria-label="Navegación mobile"
-        >
+        <nav id="cc-header-mobile-nav" className="cc-header__nav cc-header__nav--mobile" aria-label="Navegación mobile">
           <a href="#como-funciona" onClick={() => setMenuAbierto(false)}>
             Cómo funciona
-          </a>
-          <a href="#menus" onClick={() => setMenuAbierto(false)}>
-            Menús
           </a>
           <a href="#negocios" onClick={() => setMenuAbierto(false)}>
             Ofertas cerca
           </a>
-          
-            <a href="/registro"
-            className="cc-header__nav-link--cta"
-            onClick={() => setMenuAbierto(false)}
-          >
+          <a href="/registro" className="cc-header__nav-link--cta" onClick={() => setMenuAbierto(false)}>
             Registrá tu negocio
           </a>
 
           {logueado ? (
             <>
-              <button
-                type="button"
-                className="cc-header__nav-link--panel"
-                onClick={irAPanel}
-              >
+              <button type="button" className="cc-header__nav-link--panel" onClick={irAPanel}>
                 Panel
               </button>
-              <button
-                type="button"
-                className="cc-header__nav-link--login"
-                onClick={handleLogout}
-              >
+              <button type="button" className="cc-header__nav-link--login" onClick={handleLogout}>
                 Cerrar sesión
               </button>
             </>
           ) : (
             <>
-              
-               <a href="/register"
-                className="cc-header__nav-link--cta"
-                onClick={() => setMenuAbierto(false)}
-              >
+              <a href="/register" className="cc-header__nav-link--cta" onClick={() => setMenuAbierto(false)}>
                 Registrate
               </a>
-              
-               <a href="/login"
-                className="cc-header__nav-link--login"
-                onClick={() => setMenuAbierto(false)}
-              >
+              <a href="/login" className="cc-header__nav-link--login" onClick={() => setMenuAbierto(false)}>
                 Ingresar
               </a>
             </>
