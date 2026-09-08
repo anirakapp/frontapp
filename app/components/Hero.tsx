@@ -11,12 +11,11 @@ export default function Hero(): ReactElement {
           <br />
           para tu reunión
         </h1>
-
         <p className="cc-hero__lead">
           Te ayudamos a saber{" "}
           <span className="cc-hero__rotator" aria-live="polite">
             <span className="cc-hero__rotator-item cc-hero__rotator-item--a">
-             cuánto necesitás comprar.
+              cuánto necesitás comprar.
             </span>
             <span className="cc-hero__rotator-item cc-hero__rotator-item--b">
               dónde conseguirlo cerca tuyo.
@@ -24,13 +23,13 @@ export default function Hero(): ReactElement {
           </span>
         </p>
       </div>
-
       <div className="cc-hero__image" aria-hidden="true">
         <Image
           src="/assets/hero/reunion.jpg"
           alt=""
-          width={520}
-          height={220}
+          fill
+          sizes="(min-width: 860px) 480px, 100vw"
+          style={{ objectFit: "cover" }}
           priority
         />
       </div>
