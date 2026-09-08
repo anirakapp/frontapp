@@ -158,7 +158,6 @@
   .cc-hero {
     position: relative;
     overflow: hidden;
-    /* espacio real para que la imagen se note detrás del texto */
     min-height: 340px;
     justify-content: center;
   }
@@ -168,29 +167,28 @@
     z-index: 2;
   }
 
+  /* Ocultamos el next/image en mobile: usamos background-image en su lugar */
   .cc-hero__image {
-    position: absolute !important;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    max-height: none !important;
-    aspect-ratio: auto !important;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
+    display: none !important;
+  }
+
+  .cc-hero::before {
+    content: "";
+    position: absolute;
+    inset: -20px; /* excede el borde para que el blur no deje franjas nítidas en el filo */
+    background-image: url("/assets/hero/reunion.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) saturate(1.05);
+    opacity: 0.8;
     z-index: 0;
   }
 
-  .cc-hero__image img {
-    filter: blur(6px) saturate(1.05);
-    opacity: 0.8;
-  }
-
-  .cc-hero__image::after {
+  .cc-hero::after {
     content: "";
     position: absolute;
     inset: 0;
     background: rgba(255, 255, 255, 0.5);
+    z-index: 1;
   }
 }
