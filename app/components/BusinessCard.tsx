@@ -90,7 +90,7 @@ export default function BusinessCard({ negocio }: BusinessCardProps): ReactEleme
         </p>
         {negocio.whatsapp ? (
           
-            className="cc-business__whatsapp"
+             <a className="cc-business__whatsapp"
             href={armarLinkWhatsapp(negocio.whatsapp, negocio.nombre)}
             target="_blank"
             rel="noopener noreferrer"
