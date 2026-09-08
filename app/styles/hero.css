@@ -95,7 +95,9 @@
   }
 }
 /* ---------- Imagen (desktop / base) ---------- */
+/* Con `fill`, este contenedor SIEMPRE necesita position:relative + tamaño explícito */
 .cc-hero__image {
+  position: relative;
   width: 100%;
   max-width: 360px;
   max-height: 200px;
@@ -105,10 +107,8 @@
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
 }
 .cc-hero__image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  filter: none;
+  opacity: 1;
 }
 /* ============================================================
    Responsive — mobile-first
@@ -153,13 +153,14 @@
 
 /* ============================================================
    Mobile: la imagen pasa a ser fondo difuminado detrás del texto
-   (bloque al final del archivo para ganar la cascada en ≤859px;
-   !important en las props que pisan reglas de arriba)
    ============================================================ */
 @media (max-width: 859px) {
   .cc-hero {
     position: relative;
     overflow: hidden;
+    /* espacio real para que la imagen se note detrás del texto */
+    min-height: 340px;
+    justify-content: center;
   }
 
   .cc-hero__copy {
@@ -182,9 +183,6 @@
   }
 
   .cc-hero__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     filter: blur(6px) saturate(1.05);
     opacity: 0.8;
   }
