@@ -1,5 +1,4 @@
 /* styles/businesscard.css — estilos para BusinessCard.tsx */
-
 .cc-business {
   display: flex;
   flex-direction: column;
@@ -11,21 +10,18 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   max-width: 100%;
 }
-
 .cc-business:hover {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
 /* --- Imagen -------------------------------------------------------- */
-
 .cc-business__image {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
   background-color: #f1f2f4;
 }
-
 .cc-business__sponsor {
   position: absolute;
   top: 0.6rem;
@@ -39,7 +35,6 @@
   border-radius: 999px;
   letter-spacing: 0.02em;
 }
-
 .cc-business__fav {
   position: absolute;
   top: 0.6rem;
@@ -60,33 +55,28 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   transition: transform 0.15s ease, color 0.15s ease;
 }
-
 .cc-business__fav:hover {
   transform: scale(1.08);
 }
-
 .cc-business__fav--activo {
   color: #e11d48;
 }
-
 .cc-business__fav:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* --- Cuerpo ---------------------------------------------------------- */
-
 .cc-business__body {
-  padding: 0.85rem 1rem 1rem;
+  padding: 0.9rem 1rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  min-width: 0; /* evita que texto largo empuje la tarjeta y desborde */
+  gap: 0.45rem;
+  min-width: 0;
 }
-
 .cc-business__body h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #111827;
   line-height: 1.3;
@@ -94,17 +84,15 @@
 }
 
 /* --- Meta: rating / reseñas / distancia / likes, como chips --------- */
-
 .cc-business__meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
-  margin: 0.15rem 0;
+  margin: 0.1rem 0;
   padding: 0;
   list-style: none;
 }
-
 .cc-business__meta span {
   display: inline-flex;
   align-items: center;
@@ -117,33 +105,27 @@
   border-radius: 999px;
   white-space: nowrap;
 }
-
 .cc-business__meta span:nth-child(1) {
   background: #fff7e0;
   color: #92650a;
 }
-
 .cc-business__meta span:nth-child(2) {
   background: transparent;
   color: #9ca3af;
   padding-left: 0;
   font-weight: 500;
 }
-
 .cc-business__meta span:nth-child(3) {
   background: #eef2ff;
   color: #4338ca;
 }
-
 .cc-business__meta span:nth-child(4) {
   background: #fdf2f4;
   color: #be123c;
 }
 
-/* --- Dirección, teléfono y badge ------------------------------------- */
-
-.cc-business__direccion,
-.cc-business__telefono {
+/* --- Dirección --------------------------------------------------- */
+.cc-business__direccion {
   margin: 0;
   font-size: 0.82rem;
   color: #6b7280;
@@ -152,19 +134,68 @@
   white-space: nowrap;
 }
 
+/* --- Horarios: bien visible, alto contraste --------------------- */
 .cc-business__horarios {
-   margin: 0;
-  font-size: 0.82rem;
-  font-weight: bold;
-  background-color: #ff7a00;
-  color: #000000;
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
+  margin: 0.1rem 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ff8a00, #ff6a00);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(255, 122, 0, 0.35);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: fit-content;
 }
+.cc-business__horarios::before {
+  content: "🕒";
+  font-size: 0.85rem;
+}
+
+/* --- Teléfono (fallback cuando no hay whatsapp) ------------------- */
+.cc-business__telefono {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* --- Botón de WhatsApp --------------------------------------------- */
+.cc-business__whatsapp {
+  margin-top: 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: #25d366;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.7rem;
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.35);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cc-business__whatsapp:hover {
+  background: #1ebe5b;
+  transform: translateY(-1px);
+}
+.cc-business__whatsapp:active {
+  transform: translateY(0);
+}
+.cc-business__whatsapp-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* --- Badge ----------------------------------------------------------- */
 .cc-business__badge {
   margin: 0.15rem 0 0;
   display: inline-block;
@@ -184,11 +215,14 @@
 /* --- Mobile: la tarjeta nunca debe desbordar el ancho disponible ---- */
 @media (max-width: 480px) {
   .cc-business__body {
-    padding: 0.7rem 0.85rem 0.85rem;
+    padding: 0.75rem 0.85rem 0.9rem;
   }
-
   .cc-business__meta span {
     font-size: 0.72rem;
     padding: 0.22rem 0.5rem;
+  }
+  .cc-business__whatsapp {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.8rem;
   }
 }
